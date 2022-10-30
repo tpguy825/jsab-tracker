@@ -39,3 +39,19 @@ interface AppState {
 	tablejsx: JSX.Element[];
 	lastrefreshed: Date | string;
 }
+
+interface Config {
+	apihost: string;
+	apiport: number;
+	apifull: string;
+	vitehost: string;
+	viteport: number;
+	vitefull: string;
+}
+
+interface PartialConfig {
+	apihost: string;
+	apiport: number;
+	vitehost: string;
+	viteport: number;
+}

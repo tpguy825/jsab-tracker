@@ -3,22 +3,49 @@ import $ from "jquery";
 import Button from "./Button";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import config from "./config";
 
 export default class App extends React.Component {
-	apihost: string = "192.168.50.251";
-	apiport: number = 3000;
 	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never" };
 	getdata: (callback: (data: DataInfo[]) => any) => void;
+	getTable: () => void;
 
 	constructor(props: {}) {
 		super(props);
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`http://${this.apihost}:${this.apiport}/api/get`, callback);
+			$.get(`http://${config.apihost}:${config.apiport}/api/get`, callback);
+		};
+		this.getTable = () => {
+			const tablebody = document.getElementById("tablebody") as HTMLElement;
+			tablebody.innerHTML = "<span>Loading...</span>";
+
+			this.getdata((data) => {
+				let html: HTMLElement[] = [];
+				let jsx = <span>Loading...</span>;
+				data.forEach((row) => {
+					jsx = (
+						<>
+							<th scope="row">{row.id}</th>
+							<td>{row.name}</td>
+							<td>{row.rank === "" ? "Unknown" : row.rank}</td>
+							<td>{this.parsedash(row.dash)}</td>
+							<td>
+								<Button href={"/edit?id=" + row.id}>Edit</Button>
+							</td>
+						</>
+					);
+					html.push(this.jsxtohtml(jsx, "tr"));
+					tablebody.innerHTML = "";
+					html.forEach((el) => tablebody.appendChild(el));
+				});
+
+				this.setState({ ...this.state, lastrefreshed: new Date() });
+			});
 		};
 	}
 
 	componentDidMount() {
-		$.get(`http://${this.apihost}:${this.apiport}/`, (data: string) => this.setState({ ...this.state, res: data }));
+		$.get(`http://${config.apihost}:${config.apiport}/`, (data: string) => this.setState({ ...this.state, res: data }));
 		document.getElementById("refreshbutton");
 		this.getTable();
 	}
@@ -47,32 +74,6 @@ export default class App extends React.Component {
 		const staticElement = renderToStaticMarkup(jsx);
 		output.innerHTML = staticElement;
 		return output;
-	}
-
-	getTable() {
-		let tablebody = document.getElementById("tablebody") as HTMLElement;
-		tablebody.innerHTML = "<span>Loading...</span>";
-		this.getdata((data) => {
-			let html: HTMLElement[] = [];
-			data.forEach((row) => {
-				let jsx = (
-					<>
-						<th scope="row">{row.id}</th>
-						<td>{row.name}</td>
-						<td>{row.rank === "" ? "Unknown" : row.rank}</td>
-						<td>{this.parsedash(row.dash)}</td>
-						<td>
-							<Button href={"/edit?id="+row.id}>Edit</Button>
-						</td>
-					</>
-				);
-				html.push(this.jsxtohtml(jsx, "tr"));
-				tablebody.innerHTML = "";
-				html.forEach((el) => tablebody.appendChild(el));
-			});
-
-			this.setState({ ...this.state, lastrefreshed: new Date() });
-		});
 	}
 
 	render() {

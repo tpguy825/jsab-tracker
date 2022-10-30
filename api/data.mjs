@@ -2,8 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 export default class Data {
 	data;
@@ -13,7 +13,7 @@ export default class Data {
 	}
 
 	add(id, rank, dash) {
-		this.data[id] = { ...this.data[id], rank, dash };
+		this.data[id] = { ...this.data[id], rank: rank, dash: Number(dash) };
 	}
 
 	async save() {

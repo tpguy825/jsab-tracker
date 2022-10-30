@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 export default function Button(props: {
 	children: string | JSX.Element;
@@ -7,32 +6,20 @@ export default function Button(props: {
 	className?: string;
 	onClick?: React.MouseEventHandler<HTMLButtonElement>;
 	href?: string;
+	type?: "button" | "submit" | "reset";
 	extras?: any;
 }) {
-	if (props.href !== undefined) {
-		return (
-			<Link to={props.href}>
-				<button
-					type="button"
-					{...props.extras}
-					id={props.id}
-					onClick={props.onClick}
-					className={props.className === "" ? "btn btn-primary" : `btn btn-primary ${props.className}`}>
-					{props.children}
-				</button>
-			</Link>
-		);
-	} else {
-		return (
+	return (
+		<a href={props.href}>
 			<button
-				type="button"
+				type={props.type}
 				{...props.extras}
 				id={props.id}
 				onClick={props.onClick}
 				className={props.className === "" ? "btn btn-primary" : `btn btn-primary ${props.className}`}>
 				{props.children}
 			</button>
-		);
-	}
+		</a>
+	);
 }
 
