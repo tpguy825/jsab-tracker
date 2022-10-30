@@ -9,7 +9,7 @@ export default class Data {
 	data;
 
 	constructor() {
-		this.data = JSON.parse(fs.readFileSync(path.join(__dirname, "data.json"), "utf8"));
+		this.data = JSON.parse(fs.readFileSync(path.join(__dirname, "info.json"), "utf8"));
 	}
 
 	add(id, rank, dash) {
@@ -17,6 +17,7 @@ export default class Data {
 	}
 
 	async save() {
-		return await fs.promises.writeFile(path.join(__dirname, "data.json"), JSON.stringify(this.data));
+		return await fs.promises.writeFile(path.join(__dirname, "info.json"), JSON.stringify(this.data));
 	}
 }
+
