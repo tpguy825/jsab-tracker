@@ -1,2 +1,14 @@
 // Import all of Bootstrap's CSS
 @import "~bootstrap/scss/bootstrap";
+
+.help {
+	cursor: help;
+}
+
+.container {
+	margin-top: 10px;
+}
+
+#refreshbutton {
+	margin-left: 5px;
+}

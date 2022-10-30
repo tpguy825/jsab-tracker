@@ -1,61 +1,114 @@
-import { useState } from "react";
+// file deepcode ignore ReactEventHandlerThis: IT IS
+import $ from "jquery";
+import Button from "./Button";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
-export default function App() {
-	const [state, setState] = useState({ res: "No Response", table: [], tablejsx: [<></>] });
+export default class App extends React.Component {
+	apihost: string = "192.168.50.251";
+	apiport: number = 3000;
+	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never" };
+	getdata: (callback: (data: DataInfo[]) => any) => void;
 
-	fetch("http://localhost:3000/")
-		.then((res) => res.text())
-		.then((res) => setState({ res: res, table: state.table, tablejsx: state.tablejsx }));
+	constructor(props: {}) {
+		super(props);
+		this.getdata = (callback: (data: DataInfo[]) => any) => {
+			$.get(`http://${this.apihost}:${this.apiport}/api/get`, callback);
+		};
+	}
 
-	const getTable = async () => {
-		await fetch("http://localhost:3000/api/get")
-			.then((res) => res.json())
-			.then((data) => setState({ res: state.res, table: data, tablejsx: state.tablejsx }));
-		state.table.forEach((row) => {
-			state.tablejsx.push(
-				<tr>
-					<th scope="row">{row.id}</th>
-					<td>Mark</td>
-					<td>Otto</td>
-					<td>@mdo</td>
-				</tr>
-			);
+	componentDidMount() {
+		$.get(`http://${this.apihost}:${this.apiport}/`, (data: string) => this.setState({ ...this.state, res: data }));
+		document.getElementById("refreshbutton");
+		this.getTable();
+	}
+
+	parsedash(dash: number) {
+		switch (dash) {
+			case 0:
+				return "No Dash";
+
+			case 1:
+				return "Slow Poke (1-9)";
+
+			case 2:
+				return "10+";
+
+			case 3:
+				return "Unknown";
+
+			default:
+				return "Error";
+		}
+	}
+
+	jsxtohtml(jsx: JSX.Element, type: string = "div") {
+		const output = document.createElement(type);
+		const staticElement = renderToStaticMarkup(jsx);
+		output.innerHTML = staticElement;
+		return output;
+	}
+
+	getTable() {
+		let tablebody = document.getElementById("tablebody") as HTMLElement;
+		tablebody.innerHTML = "<span>Loading...</span>";
+		this.getdata((data) => {
+			let html: HTMLElement[] = [];
+			data.forEach((row) => {
+				let jsx = (
+					<>
+						<th scope="row">{row.id}</th>
+						<td>{row.name}</td>
+						<td>{row.rank === "" ? "Unknown" : row.rank}</td>
+						<td>{this.parsedash(row.dash)}</td>
+						<td>
+							<Button href={"/edit?id="+row.id}>Edit</Button>
+						</td>
+					</>
+				);
+				html.push(this.jsxtohtml(jsx, "tr"));
+				tablebody.innerHTML = "";
+				html.forEach((el) => tablebody.appendChild(el));
+			});
+
+			this.setState({ ...this.state, lastrefreshed: new Date() });
 		});
-	};
+	}
 
-	return (
-		<div className="container">
-			<span>Server response: {state.res}</span>
-			<table className="table">
-				<thead>
-					<tr>
-						<th scope="col">#</th>
-						<th scope="col">First</th>
-						<th scope="col">Last</th>
-						<th scope="col">Handle</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">1</th>
-						<td>Mark</td>
-						<td>Otto</td>
-						<td>@mdo</td>
-					</tr>
-					<tr>
-						<th scope="row">2</th>
-						<td>Jacob</td>
-						<td>Thornton</td>
-						<td>@fat</td>
-					</tr>
-					<tr>
-						<th scope="row">3</th>
-						<td>Larry the Bird</td>
-						<td>@twitter</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	);
+	render() {
+		return (
+			<div className="container">
+				<div>
+					<span>Server response: {this.state.res}</span>
+					<br />
+					<span>
+						Last refreshed: {this.state.lastrefreshed.toString()}
+						<Button id="refreshbutton" onClick={this.getTable}>
+							Refresh
+						</Button>
+					</span>
+				</div>
+				<table className="table">
+					<thead>
+						<tr>
+							<th className="help" title="How far down the track is on the playlist screen" scope="col">
+								#
+							</th>
+							<th className="help" title="Track Name" scope="col">
+								Name
+							</th>
+							<th className="help" title="Rank (S, A, B, C or Unknown)" scope="col">
+								Rank
+							</th>
+							<th className="help" title="Amount of times you dashed in a level" scope="col">
+								Dash
+							</th>
+						</tr>
+					</thead>
+					<tbody id="tablebody"></tbody>
+				</table>
+			</div>
+		);
+	}
 }
 

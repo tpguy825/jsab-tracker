@@ -1,5 +1,6 @@
-import express from 'express';
-import Data from './data.mjs';
+// file deepcode ignore TooPermissiveCorsHeader: it is for private use only
+import express from "express";
+import Data from "./data.mjs";
 
 const app = express();
 const data = new Data();
@@ -10,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/send", (req, res) => {
-	res.header("Access-control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Origin", "*");
 	try {
 		let info = JSON.parse(req.body);
 		data.add(info.id, info.rank, info.dash);
@@ -22,10 +23,11 @@ app.post("/api/send", (req, res) => {
 });
 
 app.get("/api/get", (req, res) => {
-	res.header("Access-control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Origin", "*");
 	res.json(data.data);
 });
 
 app.listen(3000, () => {
 	console.log("Server is running on port 3000");
 });
+
