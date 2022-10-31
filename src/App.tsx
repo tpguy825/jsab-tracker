@@ -17,7 +17,7 @@ export default class App extends React.Component {
 		console.log({ api: this.api, config });
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`http://${this.api}/api/get`, callback);
+			$.get(`//${this.api}/api/get`, callback);
 		};
 		this.getTable = () => {
 			const tablebody = document.getElementById("tablebody") as HTMLElement;
@@ -51,7 +51,7 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		$.get(`http://${this.api}/hello`, (data: string) => this.setState({ ...this.state, res: data }));
+		$.get(`//${this.api}/hello`, (data: string) => this.setState({ ...this.state, res: data }));
 		document.getElementById("refreshbutton");
 		this.getTable();
 	}

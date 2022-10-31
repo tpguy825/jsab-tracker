@@ -19,7 +19,7 @@ export default class Edit extends React.Component {
 		}
 		this.api = config.apifull;
 		console.log(this.api)
-		$.get(`http://${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
+		$.get(`//${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
 		});
@@ -32,7 +32,7 @@ export default class Edit extends React.Component {
 
 	sendedit(nrank: string, ndash: string, hrank: string, hdash: string): void {
 		$.post(
-			`http://${this.api}/api/edit`,
+			`//${this.api}/api/edit`,
 			JSON.stringify({
 				id: this.id,
 				normal: {
@@ -49,7 +49,7 @@ export default class Edit extends React.Component {
 
 	render(): JSX.Element {
 		return (
-			<form className="form" method="post" action={`http://${this.api}/api/edit`}>
+			<form className="form" method="post" action={`//${this.api}/api/edit`}>
 				<div className="input-group mb-3">
 					<span id="trackname">
 						{this.track} - {this.artist}
