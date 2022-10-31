@@ -10,7 +10,7 @@ const app = express();
 /** For use on forms */
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-//use cors
+// use cors
 app.use(cors());
 app.use(express.static(__dirname + "/../build"));
 
