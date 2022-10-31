@@ -14,7 +14,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.use(cors());
 app.use(express.static(__dirname + "/../build"));
 
-app.get("/", (req, res) => {
+app.get("/hello", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.send("Hello World!");
 });

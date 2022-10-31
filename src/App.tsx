@@ -51,7 +51,7 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		$.get(`http://${this.api}/`, (data: string) => this.setState({ ...this.state, res: data }));
+		$.get(`http://${this.api}/hello`, (data: string) => this.setState({ ...this.state, res: data }));
 		document.getElementById("refreshbutton");
 		this.getTable();
 	}
