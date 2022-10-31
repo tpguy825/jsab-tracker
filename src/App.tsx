@@ -56,15 +56,15 @@ export default class App extends React.Component {
 				...this.state,
 				res: {
 					data: data,
-					timeout: setTimeout(() =>
+					timeout: setTimeout(() => {
 						this.setState({
 							...this.state,
 							res: {
 								...this.state.res,
-								data: this.state.res.data === "Hello World!" ? this.state.res.data : "No Response",
+								data: this.state.res.data === "Hello World!" ? "Working" : "No Response",
 							},
-						})
-					),
+						});
+					}, 2500),
 				},
 			});
 		});
