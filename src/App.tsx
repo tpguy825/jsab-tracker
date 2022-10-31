@@ -61,7 +61,7 @@ export default class App extends React.Component {
 							...this.state,
 							res: {
 								...this.state.res,
-								data: this.state.res.data === "Hello World!" ? "Working" : "No Response",
+								data: this.state.res.data === "Hello World!" ? "Hello World!" : "No Response",
 							},
 						});
 					}, 2500),
