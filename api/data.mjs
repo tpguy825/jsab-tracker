@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
-export const original = JSON.parse(fs.readFileSync(path.join(__dirname, "data.json"), "utf8"));
+export const original = JSON.parse(fs.readFileSync(path.join(__dirname, "levels.json"), "utf8"));
 
 class Data {
 	data;
