@@ -46,7 +46,11 @@ interface DataInfo {
 
 interface AppState {
 	/** Initial server response */
-	res: string;
+	res: {
+		/** Returned data */
+		data: string;
+		timeout?: NodeJS.Timer;
+	};
 
 	/** Array of levels and their info */
 	table: DataInfo[];

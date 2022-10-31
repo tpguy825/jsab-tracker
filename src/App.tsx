@@ -7,7 +7,7 @@ import config from "../config";
 import EditScreen from "./EditScreen";
 
 export default class App extends React.Component {
-	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never", screen: 0 };
+	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never", screen: 0 };
 	api: string;
 	getdata: (callback: (data: DataInfo[]) => any) => void;
 	getTable: () => void;
@@ -52,9 +52,29 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		$.get(`//${this.api}/hello`, (data: string) => this.setState({ ...this.state, res: data }));
+		$.get(`//${this.api}/hello`, (data: string) => {
+			this.setState({
+				...this.state,
+				res: {
+					data: data,
+					timeout: setTimeout(() =>
+						this.setState({
+							...this.state,
+							res: {
+								...this.state.res,
+								data: "No Response",
+							},
+						})
+					),
+				},
+			});
+		});
 		document.getElementById("refreshbutton");
 		this.getTable();
+	}
+
+	componentWillUnmount(): void {
+		clearTimeout(this.state.res.timeout as NodeJS.Timer);
 	}
 
 	parsedash(dash: number) {
@@ -89,9 +109,11 @@ export default class App extends React.Component {
 				return <EditScreen pstate={this.state} psetState={this.setState} />;
 			default:
 				let res =
-					this.state.res === "Hello World!"
+					this.state.res.data === "Hello World!"
 						? "Running"
-						: "Server is not responding correctly. Expected 'Hello World!', but got '" + this.state.res + "'";
+						: this.state.res.data === "Waiting"
+						? "Waiting for response from server"
+						: "Server is not responding correctly. Expected 'Hello World!', but got '" + this.state.res.data + "'";
 				return (
 					<div className="container">
 						<div>
