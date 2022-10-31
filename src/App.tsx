@@ -89,9 +89,9 @@ export default class App extends React.Component {
 				return <EditScreen pstate={this.state} psetState={this.setState} />;
 			default:
 				let res =
-					this.state.res === "Hello, World!"
+					this.state.res === "Hello, World"
 						? "Running"
-						: "Server is not responding correctly. Expected 'Hello, World!', but got '" + this.state.res + "'";
+						: "Server is not responding correctly. Expected 'Hello, World', but got '" + this.state.res + "'";
 				return (
 					<div className="container">
 						<div>
