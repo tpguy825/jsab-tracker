@@ -12,7 +12,9 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // use cors
 app.use(cors());
-app.use(express.static(__dirname + "/../build"));
+app.use("/", express.static(__dirname + "/../build"));
+app.use("/edit", express.static(__dirname + "/../build"));
+
 
 app.get("/hello", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
