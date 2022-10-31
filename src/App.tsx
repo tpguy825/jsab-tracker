@@ -15,7 +15,6 @@ export default class App extends React.Component {
 	constructor(props: {}) {
 		super(props);
 		this.api = config.apifull;
-		console.log({ api: this.api, config });
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
 			$.get(`//${this.api}/api/get`, callback);

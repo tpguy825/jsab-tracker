@@ -22,7 +22,6 @@ export default class EditScreen extends React.Component<EditProps> {
 			location.href = "/";
 		}
 		this.api = config.apifull;
-		console.log(this.api);
 		$.get(`//${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
