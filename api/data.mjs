@@ -4,15 +4,16 @@ import { fileURLToPath } from "url";
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+export const original = JSON.parse(fs.readFileSync(path.join(__dirname, "data.json"), "utf8"));
 
-export default class Data {
+class Data {
 	data;
 
 	constructor() {
 		this.data = JSON.parse(fs.readFileSync(path.join(__dirname, "info.json"), "utf8"));
 	}
 
-	add(id, rank, dash) {
+	set(id, rank, dash) {
 		this.data[id] = { ...this.data[id], rank: rank, dash: Number(dash) };
 	}
 
@@ -20,4 +21,7 @@ export default class Data {
 		return await fs.promises.writeFile(path.join(__dirname, "info.json"), JSON.stringify(this.data));
 	}
 }
+
+const data = new Data();
+export default data;
 

@@ -25,9 +25,32 @@ interface DataInfo {
 	/** Version added */
 	added: string;
 
-	/** Rank (S, A, B, C, blank if unknown) */
-	rank: string;
+	/** Rank and dash amount for normal mode */
+	normal: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
 
-	/** Dash (0 - No dash, 1 - Slow Poke, 2 - <10 dashes, 3 - Unknown) */
-	dash: number;
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
+
+	/** Rank and dash amount for hardcore mode */
+	hardcore: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
+
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
+}
+
+const __filename: string;
+const __dirname: string;
+
+class Data {
+	data: DataInfo[];
+
+	add(id: number, normal: { rank: string, dash: number }, dash: { rank: string, dash: number }): void
+
+	async save(): Promise<void>
 }

@@ -1,15 +1,17 @@
 // file deepcode ignore TooPermissiveCorsHeader: it is for private use only
 import express from "express";
-import Data, { __dirname } from "./data.mjs";
+import data, { __dirname, original } from "./data.mjs";
 import bodyParser from "body-parser";
-import config from "../src/config.js";
+import config from "../config/index.mjs";
+import cors from "cors";
 
 const app = express();
-const data = new Data();
 
 /** For use on forms */
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+//use cors
+app.use(cors());
 app.use(express.static(__dirname + "/../build"));
 
 app.get("/", (req, res) => {
@@ -17,25 +19,13 @@ app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
-app.post("/api/send", (req, res) => {
-	res.header("Access-Control-Allow-Origin", "*");
-	try {
-		let info = JSON.parse(req.body);
-		data.add(info.id, info.normal, info.hardcore);
-		data.save();
-		res.redirect(`http://${config.vitehost}:${config.viteport}/`);
-	} catch (e) {
-		res.json({ error: true, message: e.message });
-	}
-});
-
 app.post("/api/edit", urlencodedParser, (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	try {
 		let info = req.body;
-		data.add(info.id - 1, info.normal, info.hardcore);
+		data.set(info.id - 1, info.normal, info.hardcore);
 		data.save();
-		res.redirect(`http://${config.vitehost}:${config.viteport}/`);
+		res.redirect(`http://${config.vitefull}/`);
 	} catch (e) {
 		res.json({ error: true, message: e.message });
 	}
@@ -62,7 +52,7 @@ app.get("/api/get", (req, res) => {
 
 app.get("/api/original", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
-	res.json(data.original);
+	res.json(original);
 });
 
 app.listen(3000, () => {

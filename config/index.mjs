@@ -21,6 +21,9 @@ function getFullUrl(host, port) {
 }
 
 try {
+	if (process.env.APIHOST === undefined || process.env.APIPORT === undefined || process.env.VITEHOST === undefined || process.env.VITEPORT === undefined) {
+		throw new Error("Environment variables not set");
+	}
 	config.apihost = process.env.APIHOST;
 	config.apiport = Number(process.env.APIPORT);
 	config.vitehost = process.env.VITEHOST;
@@ -28,8 +31,6 @@ try {
 } catch (e) {
 	if (!(e instanceof ReferenceError)) throw e;
 }
-
-console.log(config);
 
 export default config;
 
