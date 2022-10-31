@@ -3,22 +3,26 @@ import $ from "jquery";
 import config from "../config";
 import Button from "./Button";
 
-export default class Edit extends React.Component {
+export default class EditScreen extends React.Component<EditProps> {
 	id: number;
 	track: string = "";
 	artist: string = "";
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
-	api: string
+	api: string;
 
-	constructor(props: {}) {
+	/** App state */
+	ps: EditProps;
+
+	constructor(props: EditProps) {
 		super(props);
+		this.ps = props;
 		this.id = Number(new URLSearchParams(window.location.search).get("id"));
 		if (this.id < 1 || this.id > 54) {
 			location.href = "/";
 		}
 		this.api = config.apifull;
-		console.log(this.api)
+		console.log(this.api);
 		$.get(`//${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
@@ -47,9 +51,13 @@ export default class Edit extends React.Component {
 		);
 	}
 
-	render(): JSX.Element {
+	render() {
 		return (
-			<form className="form" method="post" action={`//${this.api}/api/edit`}>
+			<form
+				className="form"
+				method="post"
+				onSubmit={() => this.ps.psetState({ ...this.ps.pstate, screen: 0 })}
+				action={`//${this.api}/api/edit`}>
 				<div className="input-group mb-3">
 					<span id="trackname">
 						{this.track} - {this.artist}

@@ -4,9 +4,10 @@ import Button from "./Button";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import config from "../config";
+import EditScreen from "./EditScreen";
 
 export default class App extends React.Component {
-	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never" };
+	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never", screen: 0 };
 	api: string;
 	getdata: (callback: (data: DataInfo[]) => any) => void;
 	getTable: () => void;
@@ -36,7 +37,7 @@ export default class App extends React.Component {
 							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
 							<td>{this.parsedash(row.hardcore.dash)}</td>
 							<td>
-								<Button href={"/edit?id=" + row.id}>Edit</Button>
+								<Button onClick={() => this.setState({ ...this.state, screen: 1 })}>Edit</Button>
 							</td>
 						</>
 					);
@@ -82,46 +83,59 @@ export default class App extends React.Component {
 		return output;
 	}
 
+	getScreen(screen: number): JSX.Element {
+		switch (screen) {
+			case 1:
+				return <EditScreen pstate={this.state} psetState={this.setState} />;
+			default:
+				let res =
+					this.state.res === "Hello, World!"
+						? "Running"
+						: "Server is not responding correctly. Expected 'Hello, World!', but got '" + this.state.res + "'";
+				return (
+					<div className="container">
+						<div>
+							<span>Server status: {res}</span>
+							<br />
+							<span>
+								Last refreshed: {this.state.lastrefreshed.toString()}
+								<Button id="refreshbutton" onClick={this.getTable}>
+									Refresh
+								</Button>
+							</span>
+						</div>
+						<table className="table">
+							<thead>
+								<tr>
+									<th className="help idcol" title="How far down the track is on the playlist screen" scope="col">
+										#
+									</th>
+									<th className="help" title="Track Name" scope="col">
+										Name
+									</th>
+									<th className="help" title="Normal Rank (S, A, B, C or Unknown)" scope="col">
+										Normal Rank
+									</th>
+									<th className="help" title="Amount of times you dashed in a level on 'Normal' mode" scope="col">
+										Dash (Normal)
+									</th>
+									<th className="help" title="Hardcore Rank (S, A, B, C or Unknown)" scope="col">
+										Hardcore Rank
+									</th>
+									<th className="help" title="Amount of times you dashed in a level on 'Hardcore' mode" scope="col">
+										Dash (Hardcore)
+									</th>
+								</tr>
+							</thead>
+							<tbody id="tablebody"></tbody>
+						</table>
+					</div>
+				);
+		}
+	}
+
 	render() {
-		return (
-			<div className="container">
-				<div>
-					<span>Server response: {this.state.res}</span>
-					<br />
-					<span>
-						Last refreshed: {this.state.lastrefreshed.toString()}
-						<Button id="refreshbutton" onClick={this.getTable}>
-							Refresh
-						</Button>
-					</span>
-				</div>
-				<table className="table">
-					<thead>
-						<tr>
-							<th className="help idcol" title="How far down the track is on the playlist screen" scope="col">
-								#
-							</th>
-							<th className="help" title="Track Name" scope="col">
-								Name
-							</th>
-							<th className="help" title="Normal Rank (S, A, B, C or Unknown)" scope="col">
-								Normal Rank
-							</th>
-							<th className="help" title="Amount of times you dashed in a level on 'Normal' mode" scope="col">
-								Dash (Normal)
-							</th>
-							<th className="help" title="Hardcore Rank (S, A, B, C or Unknown)" scope="col">
-								Hardcore Rank
-							</th>
-							<th className="help" title="Amount of times you dashed in a level on 'Hardcore' mode" scope="col">
-								Dash (Hardcore)
-							</th>
-						</tr>
-					</thead>
-					<tbody id="tablebody"></tbody>
-				</table>
-			</div>
-		);
+		return this.getScreen(this.state.screen);
 	}
 }
 

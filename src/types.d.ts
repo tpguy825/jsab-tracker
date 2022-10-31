@@ -45,10 +45,25 @@ interface DataInfo {
 }
 
 interface AppState {
+	/** Initial server response */
 	res: string;
+
+	/** Array of levels and their info */
 	table: DataInfo[];
+
+	/** JSX for the main table */
 	tablejsx: JSX.Element[];
+
+	/** Time since the table was last updated */
 	lastrefreshed: Date | string;
+
+	/** Screen number (0 - default, 1 - edit mode) */
+	screen: 0 | 1;
+}
+
+interface EditProps {
+	pstate: AppState;
+	psetState: React.Dispatch<React.SetStateAction<AppState>>;
 }
 
 interface Config {
@@ -66,5 +81,4 @@ interface PartialConfig {
 	vitehost: string;
 	viteport: number;
 }
-
 
