@@ -1,9 +1,8 @@
 // file deepcode ignore TooPermissiveCorsHeader: it is for private use only
 import express from "express";
-import Data , { __dirname } from "./data.mjs";
+import Data, { __dirname } from "./data.mjs";
 import bodyParser from "body-parser";
 import config from "../src/config.js";
-
 
 const app = express();
 const data = new Data();
@@ -22,7 +21,7 @@ app.post("/api/send", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	try {
 		let info = JSON.parse(req.body);
-		data.add(info.id, info.rank, info.dash);
+		data.add(info.id, info.normal, info.hardcore);
 		data.save();
 		res.redirect(`http://${config.vitehost}:${config.viteport}/`);
 	} catch (e) {
@@ -34,7 +33,7 @@ app.post("/api/edit", urlencodedParser, (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	try {
 		let info = req.body;
-		data.add(info.id-1, info.rank, info.dash);
+		data.add(info.id - 1, info.normal, info.hardcore);
 		data.save();
 		res.redirect(`http://${config.vitehost}:${config.viteport}/`);
 	} catch (e) {
@@ -47,7 +46,7 @@ app.get("/api/track", (req, res) => {
 	let sent = false;
 	data.data.forEach((e) => {
 		if (`${e.id}` === req.query.id) {
-			res.json({ error: false, ...e });
+			res.json(e);
 			sent = true;
 		}
 	});
@@ -59,6 +58,11 @@ app.get("/api/track", (req, res) => {
 app.get("/api/get", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.json(data.data);
+});
+
+app.get("/api/original", (req, res) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.json(data.original);
 });
 
 app.listen(3000, () => {

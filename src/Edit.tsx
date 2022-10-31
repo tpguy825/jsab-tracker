@@ -1,6 +1,6 @@
 import React from "react";
 import $ from "jquery";
-import config from "./config";
+import config from "../config";
 import Button from "./Button";
 
 export default class Edit extends React.Component {
@@ -9,6 +9,7 @@ export default class Edit extends React.Component {
 	artist: string = "";
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
+	api: string
 
 	constructor(props: {}) {
 		super(props);
@@ -16,7 +17,9 @@ export default class Edit extends React.Component {
 		if (this.id < 1 || this.id > 54) {
 			location.href = "/";
 		}
-		$.get(`http://${config.apihost}:${config.apiport}/api/track?id=${this.id}`, (data: DataInfo) => {
+		this.api = config.apifull;
+		console.log(this.api)
+		$.get(`http://${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
 		});
@@ -27,20 +30,26 @@ export default class Edit extends React.Component {
 		trackname.innerText = `${this.track} - ${this.artist}`;
 	}
 
-	sendedit(rank: string, dash: string) {
+	sendedit(nrank: string, ndash: string, hrank: string, hdash: string): void {
 		$.post(
-			`http://${config.apihost}:${config.apiport}/api/edit`,
+			`http://${this.api}/api/edit`,
 			JSON.stringify({
 				id: this.id,
-				rank: rank,
-				dash: dash,
+				normal: {
+					rank: nrank,
+					dash: ndash,
+				},
+				hardcore: {
+					rank: hrank,
+					dash: hdash,
+				},
 			})
 		);
 	}
 
 	render(): JSX.Element {
 		return (
-			<form className="form" method="post" action={`http://${config.apihost}:${config.apiport}/api/edit`}>
+			<form className="form" method="post" action={`http://${this.api}/api/edit`}>
 				<div className="input-group mb-3">
 					<span id="trackname">
 						{this.track} - {this.artist}
@@ -75,3 +84,4 @@ export default class Edit extends React.Component {
 		);
 	}
 }
+

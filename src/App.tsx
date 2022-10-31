@@ -3,17 +3,21 @@ import $ from "jquery";
 import Button from "./Button";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import config from "./config";
+import config from "../config";
 
 export default class App extends React.Component {
 	state: AppState = { res: "No Response", table: [], tablejsx: [], lastrefreshed: "Never" };
+	api: string;
 	getdata: (callback: (data: DataInfo[]) => any) => void;
 	getTable: () => void;
 
 	constructor(props: {}) {
 		super(props);
+		this.api = config.apifull;
+		console.log({ api: this.api, config });
+
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`http://${config.apihost}:${config.apiport}/api/get`, callback);
+			$.get(`http://${this.api}/api/get`, callback);
 		};
 		this.getTable = () => {
 			const tablebody = document.getElementById("tablebody") as HTMLElement;
@@ -27,8 +31,10 @@ export default class App extends React.Component {
 						<>
 							<th scope="row">{row.id}</th>
 							<td>{row.name}</td>
-							<td>{row.rank === "" ? "Unknown" : row.rank}</td>
-							<td>{this.parsedash(row.dash)}</td>
+							<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
+							<td>{this.parsedash(row.normal.dash)}</td>
+							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
+							<td>{this.parsedash(row.hardcore.dash)}</td>
 							<td>
 								<Button href={"/edit?id=" + row.id}>Edit</Button>
 							</td>
@@ -45,7 +51,7 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		$.get(`http://${config.apihost}:${config.apiport}/`, (data: string) => this.setState({ ...this.state, res: data }));
+		$.get(`http://${this.api}/`, (data: string) => this.setState({ ...this.state, res: data }));
 		document.getElementById("refreshbutton");
 		this.getTable();
 	}
@@ -92,17 +98,23 @@ export default class App extends React.Component {
 				<table className="table">
 					<thead>
 						<tr>
-							<th className="help" title="How far down the track is on the playlist screen" scope="col">
+							<th className="help idcol" title="How far down the track is on the playlist screen" scope="col">
 								#
 							</th>
 							<th className="help" title="Track Name" scope="col">
 								Name
 							</th>
-							<th className="help" title="Rank (S, A, B, C or Unknown)" scope="col">
-								Rank
+							<th className="help" title="Normal Rank (S, A, B, C or Unknown)" scope="col">
+								Normal Rank
 							</th>
-							<th className="help" title="Amount of times you dashed in a level" scope="col">
-								Dash
+							<th className="help" title="Amount of times you dashed in a level on 'Normal' mode" scope="col">
+								Dash (Normal)
+							</th>
+							<th className="help" title="Hardcore Rank (S, A, B, C or Unknown)" scope="col">
+								Hardcore Rank
+							</th>
+							<th className="help" title="Amount of times you dashed in a level on 'Hardcore' mode" scope="col">
+								Dash (Hardcore)
 							</th>
 						</tr>
 					</thead>

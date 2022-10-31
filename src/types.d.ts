@@ -25,13 +25,24 @@ interface DataInfo {
 	/** Version added */
 	added: string;
 
-	/** Rank (S, A, B, C, blank if unknown) */
-	rank: string;
+	/** Rank and dash amount for normal mode */
+	normal: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
 
-	/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
-	dash: number;
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
+
+	/** Rank and dash amount for hardcore mode */
+	hardcore: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
+
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
 }
-
 
 interface AppState {
 	res: string;
@@ -55,3 +66,5 @@ interface PartialConfig {
 	vitehost: string;
 	viteport: number;
 }
+
+
