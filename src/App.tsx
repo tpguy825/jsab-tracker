@@ -51,7 +51,7 @@ export default class App extends React.Component {
 		};
 	}
 
-	componentDidMount() {
+	updateresponse() {
 		$.get(`//${this.api}/hello`, (data: string) => {
 			this.setState({
 				...this.state,
@@ -69,7 +69,10 @@ export default class App extends React.Component {
 				},
 			});
 		});
-		document.getElementById("refreshbutton");
+	}
+
+	componentDidMount(): void {
+		this.updateresponse();
 		this.getTable();
 	}
 
