@@ -23,7 +23,7 @@ export default class EditScreen extends React.Component {
 		if (this.id < 1 || this.id > 54) {
 			location.href = "/";
 		}
-		$.get(`//${window.location.host}/api/track?id=${this.id}`, (data: DataInfo) => {
+		$.get(`//${window.location.href}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
 		});
@@ -36,7 +36,7 @@ export default class EditScreen extends React.Component {
 
 	sendedit(nrank: string, ndash: string, hrank: string, hdash: string): void {
 		$.post(
-			`//${window.location.host}/api/edit`,
+			`//${window.location.href}/api/edit`,
 			JSON.stringify({
 				id: this.id,
 				normal: {
@@ -58,7 +58,7 @@ export default class EditScreen extends React.Component {
 
 	render() {
 		return (
-			<form className="form" method="post" onSubmit={() => this.gotomain()} action={`//${window.location.host}/api/edit`}>
+			<form className="form" method="post" onSubmit={() => this.gotomain()} action={`//${window.location.href}/api/edit`}>
 				<div className="input-group mb-3">
 					<span id="trackname">
 						{this.track} - {this.artist}
