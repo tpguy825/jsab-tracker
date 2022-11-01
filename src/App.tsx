@@ -3,21 +3,22 @@ import $ from "jquery";
 import Button from "./Button";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import config from "../config";
 import EditScreen from "./EditScreen";
 
 export default class App extends React.Component {
-	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never", screen: 0 };
-	api: string;
+	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never" };
 	getdata: (callback: (data: DataInfo[]) => any) => void;
 	getTable: () => void;
 
 	constructor(props: {}) {
 		super(props);
-		this.api = config.apifull;
+
+		if (localStorage.getItem("screen") !== "1" && localStorage.getItem("screen") !== "0") {
+			localStorage.setItem("screen", "0");
+		}
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`//${this.api}/api/get`, callback);
+			$.get(`//${window.location.host}/api/get`, callback);
 		};
 		this.getTable = () => {
 			const tablebody = document.getElementById("tablebody") as HTMLElement;
@@ -36,7 +37,13 @@ export default class App extends React.Component {
 							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
 							<td>{this.parsedash(row.hardcore.dash)}</td>
 							<td>
-								<Button onClick={() => this.setState({ ...this.state, screen: 1 })}>Edit</Button>
+								<Button
+									onClick={() => {
+										localStorage.setItem("screen", "1");
+										location.reload();
+									}}>
+									Edit
+								</Button>
 							</td>
 						</>
 					);
@@ -51,7 +58,7 @@ export default class App extends React.Component {
 	}
 
 	updateresponse() {
-		$.get(`//${this.api}/hello`, (data: string) => {
+		$.get(`//${window.location.host}/hello`, (data: string) => {
 			this.setState({
 				...this.state,
 				res: {
@@ -105,10 +112,23 @@ export default class App extends React.Component {
 		return output;
 	}
 
+	testscreen(screen: string): 0 | 1 {
+		switch (screen) {
+			case "1":
+				return 1;
+
+			case "0":
+				return 0;
+
+			default:
+				return 0;
+		}
+	}
+
 	getScreen(screen: number): JSX.Element {
 		switch (screen) {
 			case 1:
-				return <EditScreen pstate={this.state} psetState={this.setState} />;
+				return <EditScreen />;
 			default:
 				let res =
 					this.state.res.data === "Hello World!"
@@ -159,7 +179,7 @@ export default class App extends React.Component {
 	}
 
 	render() {
-		return this.getScreen(this.state.screen);
+		return this.getScreen(this.testscreen(localStorage.getItem("screen") as string));
 	}
 }
 

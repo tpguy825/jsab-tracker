@@ -1,28 +1,29 @@
 import React from "react";
 import $ from "jquery";
-import config from "../config";
 import Button from "./Button";
 
-export default class EditScreen extends React.Component<EditProps> {
+export default class EditScreen extends React.Component {
 	id: number;
 	track: string = "";
 	artist: string = "";
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
-	api: string;
+	screen: number;
 
-	/** App state */
-	ps: EditProps;
-
-	constructor(props: EditProps) {
+	constructor(props: {}) {
 		super(props);
-		this.ps = props;
+		let screen = Number(localStorage.getItem("screen"));
+		this.screen = screen || 0;
+
+		if (this.screen !== 1) {
+			this.gotomain();
+		}
+
 		this.id = Number(new URLSearchParams(window.location.search).get("id"));
 		if (this.id < 1 || this.id > 54) {
 			location.href = "/";
 		}
-		this.api = config.apifull;
-		$.get(`//${this.api}/api/track?id=${this.id}`, (data: DataInfo) => {
+		$.get(`//${window.location.host}/api/track?id=${this.id}`, (data: DataInfo) => {
 			this.track = data.name;
 			this.artist = data.artist;
 		});
@@ -35,7 +36,7 @@ export default class EditScreen extends React.Component<EditProps> {
 
 	sendedit(nrank: string, ndash: string, hrank: string, hdash: string): void {
 		$.post(
-			`//${this.api}/api/edit`,
+			`//${window.location.host}/api/edit`,
 			JSON.stringify({
 				id: this.id,
 				normal: {
@@ -50,13 +51,14 @@ export default class EditScreen extends React.Component<EditProps> {
 		);
 	}
 
+	gotomain() {
+		localStorage.setItem("screen", "0");
+		location.reload();
+	}
+
 	render() {
 		return (
-			<form
-				className="form"
-				method="post"
-				onSubmit={() => this.ps.psetState({ ...this.ps.pstate, screen: 0 })}
-				action={`//${this.api}/api/edit`}>
+			<form className="form" method="post" onSubmit={() => this.gotomain()} action={`//${window.location.host}/api/edit`}>
 				<div className="input-group mb-3">
 					<span id="trackname">
 						{this.track} - {this.artist}
@@ -86,6 +88,7 @@ export default class EditScreen extends React.Component<EditProps> {
 				</div>
 				<div className="input-group mb-3">
 					<Button type="submit">Submit</Button>
+					<button type="submit" className="btn btn-outline-secondary">Cancel</button>
 				</div>
 			</form>
 		);

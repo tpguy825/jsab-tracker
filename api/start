@@ -1,4 +1,4 @@
-export APIHOST="jsab.tpguy825.cf"
+export APIHOST=""
 export APIPORT="443"
 export VITEHOST="jsab.tpguy825.cf"
 export VITEPORT="443"

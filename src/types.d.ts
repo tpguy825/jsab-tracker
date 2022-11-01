@@ -60,9 +60,6 @@ interface AppState {
 
 	/** Time since the table was last updated */
 	lastrefreshed: Date | string;
-
-	/** Screen number (0 - default, 1 - edit mode) */
-	screen: 0 | 1;
 }
 
 interface EditProps {
