@@ -18,7 +18,7 @@ export default class App extends React.Component {
 		}
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`//${window.location.host}/api/get`, callback);
+			$.get(`//${window.location.href}/api/get`, callback);
 		};
 		this.getTable = () => {
 			const tablebody = document.getElementById("tablebody") as HTMLElement;
@@ -58,7 +58,7 @@ export default class App extends React.Component {
 	}
 
 	updateresponse() {
-		$.get(`//${window.location.host}/hello`, (data: string) => {
+		$.get(`//${window.location.href}/hello`, (data: string) => {
 			this.setState({
 				...this.state,
 				res: {
