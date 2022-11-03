@@ -8,7 +8,6 @@ import EditScreen from "./EditScreen";
 export default class App extends React.Component {
 	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never" };
 	getdata: (callback: (data: DataInfo[]) => any) => void;
-	getTable: () => void;
 
 	constructor(props: {}) {
 		super(props);
@@ -18,47 +17,55 @@ export default class App extends React.Component {
 		}
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`//${window.location.href}/api/get`, callback);
-		};
-		this.getTable = () => {
-			const tablebody = document.getElementById("tablebody") as HTMLElement;
-			tablebody.innerHTML = "<span>Loading...</span>";
-
-			this.getdata((data) => {
-				let html: HTMLElement[] = [];
-				let jsx = <span>Loading...</span>;
-				data.forEach((row) => {
-					jsx = (
-						<>
-							<th scope="row">{row.id}</th>
-							<td>{row.name}</td>
-							<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
-							<td>{this.parsedash(row.normal.dash)}</td>
-							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
-							<td>{this.parsedash(row.hardcore.dash)}</td>
-							<td>
-								<Button
-									onClick={() => {
-										localStorage.setItem("screen", "1");
-										location.reload();
-									}}>
-									Edit
-								</Button>
-							</td>
-						</>
-					);
-					html.push(this.jsxtohtml(jsx, "tr"));
-					tablebody.innerHTML = "";
-					html.forEach((el) => tablebody.appendChild(el));
-				});
-
-				this.setState({ ...this.state, lastrefreshed: new Date() });
-			});
+			$.get(`//${window.location.hostname}/api/get`, callback);
 		};
 	}
 
+	getTable() {
+		let tablebody = document.getElementById("tablebody");
+
+		let table = tablebody as HTMLElement;
+
+		this.getdata((data) => {
+			let html: HTMLElement[] = [];
+			let jsx = <span>Loading...</span>;
+			data.forEach((row) => {
+				jsx = (
+					<>
+						<th scope="row">{row.id}</th>
+						<td>{row.name}</td>
+						<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
+						<td>{this.parsedash(row.normal.dash)}</td>
+						<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
+						<td>{this.parsedash(row.hardcore.dash)}</td>
+						<td>
+							<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
+								Edit
+							</button>
+						</td>
+					</>
+				);
+				html.push(this.jsxtohtml(jsx, "tr"));
+				table.innerHTML = "";
+			});
+			html.forEach((el) => {
+				table.appendChild(el);
+				el.addEventListener("click", (ev) => {
+					this.gotoedit(ev.target as HTMLElement);
+				});
+			});
+
+			this.setState({ ...this.state, lastrefreshed: new Date() });
+		});
+	}
+
+	gotoedit(row: HTMLElement) {
+		localStorage.setItem("screen", "1");
+		location.href = `/?id=${row.dataset.id}`;
+	}
+
 	updateresponse() {
-		$.get(`//${window.location.href}/hello`, (data: string) => {
+		$.get(`//${window.location.hostname}/hello`, (data: string) => {
 			this.setState({
 				...this.state,
 				res: {
@@ -78,8 +85,15 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount(): void {
-		this.updateresponse();
-		this.getTable();
+		try {
+			if (this.testscreen(localStorage.getItem("screen") as string) === 0) {
+				this.updateresponse();
+				this.getTable();
+			}
+		} catch (e) {
+			console.log(e);
+			setTimeout(this.componentDidMount);
+		}
 	}
 
 	componentWillUnmount(): void {
@@ -116,9 +130,6 @@ export default class App extends React.Component {
 		switch (screen) {
 			case "1":
 				return 1;
-
-			case "0":
-				return 0;
 
 			default:
 				return 0;
