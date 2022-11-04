@@ -4,9 +4,15 @@ export APIPORT=""
 export VITEHOST=""
 export VITEPORT="443"
 
+export nodemon=1
+
 if [[ $EUID > 0 ]]; then # we can compare directly with this syntax.
   	echo "Please run as root/sudo"
   	exit 1
 else
-	nodemon api
+	if [[ $nodemon > 0 ]]; then
+		nodemon api
+	else
+		node api
+	fi
 fi

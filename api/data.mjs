@@ -6,15 +6,15 @@ export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 export const original = JSON.parse(fs.readFileSync(path.join(__dirname, "levels.json"), "utf8"));
 
-class Data {
+export class Data {
 	data;
 
 	constructor() {
 		this.data = JSON.parse(fs.readFileSync(path.join(__dirname, "info.json"), "utf8"));
 	}
 
-	set(id, rank, dash) {
-		this.data[id] = { ...this.data[id], rank: rank, dash: Number(dash) };
+	set(id, normalRank, normalDash, hardcoreRank, hardcoreDash) {
+		this.data[id] = { ...this.data[id], normal: { rank: normalRank, dash: normalDash}, hardcore: { rank: hardcoreRank, dash: hardcoreDash } };
 	}
 
 	async save() {
@@ -22,6 +22,4 @@ class Data {
 	}
 }
 
-const data = new Data();
-export default data;
 

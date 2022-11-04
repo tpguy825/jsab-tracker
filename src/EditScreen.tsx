@@ -51,7 +51,7 @@ export default class EditScreen extends React.Component {
 
 	gotomain() {
 		localStorage.setItem("screen", "0");
-		location.reload();
+		location.href = "/";
 	}
 
 	jsxtohtml(jsx: JSX.Element, type: string = "div") {
@@ -62,14 +62,16 @@ export default class EditScreen extends React.Component {
 	}
 
 	form() {
-		const info = fetch("//" + window.location.hostname + "/api/track?id=" + this.id);
+		const info = fetch(`//${window.location.hostname}/api/track?id=` + this.id);
 		const edit = document.getElementById("edit") as HTMLElement;
 		info.then((res) => res.json())
 			.then((data: DataInfo) => {
 				edit.replaceChildren(
 					this.jsxtohtml(
 						<div className="container px-5 my-5">
-							<form className="form" method="post" onSubmit={() => this.gotomain()} action={`//${window.location.hostname}/api/edit`}>
+							<form className="form" method="get" action={`//${window.location.hostname}/api/edit`}>
+								{/* hidden input */}
+								<input aria-hidden="true" type="hidden" name="id" value={data.id}/>
 								<div className="mb-3">
 									<span>
 										{data.name} - {data.artist}
@@ -79,58 +81,66 @@ export default class EditScreen extends React.Component {
 									<label className="form-label" htmlFor="normalRank">
 										Normal Rank
 									</label>
-									<select className="form-select" id="normalRank" name="normalRank" aria-label="Normal Rank">
-										<option selected={data.normal.rank === "A"} value="A">
-											A
-										</option>
-										<option selected={data.normal.rank === "S"} value="S">
-											S
-										</option>
-										<option selected={data.normal.rank === "B"} value="B">
-											B
-										</option>
-										<option selected={data.normal.rank === "C"} value="C">
-											C
-										</option>
+									<select
+										defaultValue={data.normal.rank}
+										className="form-select"
+										id="normalRank"
+										name="normalRank"
+										aria-label="Normal Rank">
+										<option value="S">S</option>
+										<option value="A">A</option>
+										<option value="B">B</option>
+										<option value="C">C</option>
+										<option value="">Unknown</option>
 									</select>
 								</div>
 								<div className="mb-3">
 									<label className="form-label" htmlFor="normalDash">
 										Normal Dash Count
 									</label>
-									<select className="form-select" id="normalDash" name="normalDash" aria-label="Normal Dash Count">
+									<select
+										defaultValue={data.normal.dash}
+										className="form-select"
+										id="normalDash"
+										name="normalDash"
+										aria-label="Normal Dash Count">
 										<option value="0">What Dash? (No Dash)</option>
 										<option value="1">Slow Poke (1-10 times)</option>
 										<option value="2">{">"} 10 times</option>
+										<option value="3">Unknown</option>
 									</select>
 								</div>
 								<div className="mb-3">
 									<label className="form-label" htmlFor="hardcoreRank">
 										Hardcore Rank
 									</label>
-									<select className="form-select" id="hardcoreRank" name="hardcoreRank" aria-label="Hardcore Rank">
-										<option selected={data.hardcore.rank === "A"} value="A">
-											A
-										</option>
-										<option selected={data.hardcore.rank === "S"} value="S">
-											S
-										</option>
-										<option selected={data.hardcore.rank === "B"} value="B">
-											B
-										</option>
-										<option selected={data.hardcore.rank === "C"} value="C">
-											C
-										</option>
+									<select
+										defaultValue={data.hardcore.rank}
+										className="form-select"
+										id="hardcoreRank"
+										name="hardcoreRank"
+										aria-label="Hardcore Rank">
+										<option value="S">S</option>
+										<option value="A">A</option>
+										<option value="B">B</option>
+										<option value="C">C</option>
+										<option value="">Unknown</option>
 									</select>
 								</div>
 								<div className="mb-3">
 									<label className="form-label" htmlFor="hardcoreDash">
 										Hardcore Dash Count
 									</label>
-									<select className="form-select" id="hardcoreDash" name="hardcoreDash" aria-label="Hardcore Dash Count">
+									<select
+										defaultValue={data.hardcore.dash}
+										className="form-select"
+										id="hardcoreDash"
+										name="hardcoreDash"
+										aria-label="Hardcore Dash Count">
 										<option value="0">What Dash? (No Dash)</option>
 										<option value="1">Slow Poke (1-10 times)</option>
 										<option value="2">{">"} 10 times</option>
+										<option value="3">Unknown</option>
 									</select>
 								</div>
 								<div className="d-grid">
@@ -152,14 +162,14 @@ export default class EditScreen extends React.Component {
 					this.jsxtohtml(
 						<div className="container px-5 my-5">
 							<div className="mb-3">
-								<span>Error: {err}</span>
+								<span>Error: {err.message}</span>
 								<br />
 								<button onClick={() => this.gotomain()} type="button" className="btn btn-primary">
 									Back
 								</button>
 							</div>
 						</div>
-					),
+					)
 				);
 			});
 	}
