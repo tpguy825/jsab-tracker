@@ -1,4 +1,4 @@
-// file deepcode ignore ReactEventHandlerThis: IT IS
+// file deepcode ignore ReactEventHandlerThis, file deepcode ignore ReactMissingCleanup
 import $ from "jquery";
 import Button from "./Button";
 import React from "react";
@@ -8,16 +8,19 @@ import EditScreen from "./EditScreen";
 export default class App extends React.Component {
 	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never" };
 	getdata: (callback: (data: DataInfo[]) => any) => void;
+	hostname: string;
 
 	constructor(props: {}) {
 		super(props);
+
+		this.hostname = location.hostname === "localhost" ? "http://localhost:80" : location.hostname;
 
 		if (localStorage.getItem("screen") !== "1" && localStorage.getItem("screen") !== "0") {
 			localStorage.setItem("screen", "0");
 		}
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`//${window.location.hostname}/api/get`, callback);
+			$.get(`${this.hostname}/api/get`, callback);
 		};
 	}
 
@@ -64,40 +67,15 @@ export default class App extends React.Component {
 		location.href = `/?id=${row.dataset.id}`;
 	}
 
-	updateresponse() {
-		$.get(`//${window.location.hostname}/hello`, (data: string) => {
-			this.setState({
-				...this.state,
-				res: {
-					data: data,
-					timeout: setTimeout(() => {
-						this.setState({
-							...this.state,
-							res: {
-								...this.state.res,
-								data: this.state.res.data === "Hello World!" ? "Hello World!" : "No Response",
-							},
-						});
-					}, 2500),
-				},
-			});
-		});
-	}
-
 	componentDidMount(): void {
 		try {
 			if (this.testscreen(localStorage.getItem("screen") as string) === 0) {
-				this.updateresponse();
 				this.getTable();
 			}
 		} catch (e) {
 			console.log(e);
-			setTimeout(this.componentDidMount);
+			setTimeout(this.componentDidMount, 100);
 		}
-	}
-
-	componentWillUnmount(): void {
-		clearTimeout(this.state.res.timeout as NodeJS.Timer);
 	}
 
 	parsedash(dash: number) {
@@ -141,17 +119,10 @@ export default class App extends React.Component {
 			case 1:
 				return <EditScreen />;
 			default:
-				let res =
-					this.state.res.data === "Hello World!"
-						? "Running"
-						: this.state.res.data === "Waiting"
-						? "Waiting for response from server"
-						: "Server is not responding correctly. Expected 'Hello World!', but got '" + this.state.res.data + "'";
+
 				return (
 					<div className="container">
 						<div>
-							<span>Server status: {res}</span>
-							<br />
 							<span>
 								Last refreshed: {this.state.lastrefreshed.toString()}
 								<Button id="refreshbutton" onClick={this.getTable}>

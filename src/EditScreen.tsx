@@ -1,6 +1,5 @@
 // file deepcode ignore ReactIncorrectReturnValue, file deepcode ignore DOMXSS, file deepcode ignore ReactDeprecatedElementProp
 import React from "react";
-import $ from "jquery";
 import { renderToStaticMarkup } from "react-dom/server";
 
 export default class EditScreen extends React.Component {
@@ -8,9 +7,11 @@ export default class EditScreen extends React.Component {
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
 	screen: number;
+	hostname: string
 
 	constructor(props: {}) {
 		super(props);
+		this.hostname = location.hostname === "localhost" ? "http://localhost:80" : location.hostname;
 		let screen = Number(localStorage.getItem("screen") as string);
 		this.screen = screen || 0;
 
@@ -32,23 +33,6 @@ export default class EditScreen extends React.Component {
 		this.form();
 	}
 
-	sendedit(nrank: string, ndash: string, hrank: string, hdash: string): void {
-		$.post(
-			`//${window.location.hostname}/api/edit`,
-			JSON.stringify({
-				id: this.id,
-				normal: {
-					rank: nrank,
-					dash: ndash,
-				},
-				hardcore: {
-					rank: hrank,
-					dash: hdash,
-				},
-			})
-		);
-	}
-
 	gotomain() {
 		localStorage.setItem("screen", "0");
 		location.href = "/";
@@ -62,14 +46,14 @@ export default class EditScreen extends React.Component {
 	}
 
 	form() {
-		const info = fetch(`//${window.location.hostname}/api/track?id=` + this.id);
+		const info = fetch(`${this.hostname}/api/track?id=` + this.id);
 		const edit = document.getElementById("edit") as HTMLElement;
 		info.then((res) => res.json())
 			.then((data: DataInfo) => {
 				edit.replaceChildren(
 					this.jsxtohtml(
 						<div className="container px-5 my-5">
-							<form className="form" method="get" action={`//${window.location.hostname}/api/edit`}>
+							<form className="form" method="get" action={`${this.hostname}/api/edit`}>
 								{/* hidden input */}
 								<input aria-hidden="true" type="hidden" name="id" value={data.id}/>
 								<div className="mb-3">

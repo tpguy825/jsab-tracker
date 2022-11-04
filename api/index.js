@@ -39,7 +39,7 @@ const getRequestFrom = (req) => {
 
 // use cors
 app.use(cors());
-app.use(express.static(__dirname + "/../build"));
+app.use("/", express.static(__dirname + "/../build"));
 app.use((req, res, next) => {
 	console.log(`${req.method} ${getRequestFrom(req)}${req.url}`);
 	next();
