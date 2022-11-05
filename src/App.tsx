@@ -20,8 +20,7 @@ export default class App extends React.Component {
 		}
 
 		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			console.log(this.hostname)
-			$.get(`${this.hostname}/api/get`, callback);
+			$.get(`//${this.hostname}/api/get`, callback);
 		};
 	}
 

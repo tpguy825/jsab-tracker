@@ -46,14 +46,14 @@ export default class EditScreen extends React.Component {
 	}
 
 	form() {
-		const info = fetch(`${this.hostname}/api/track?id=` + this.id);
+		const info = fetch(`//${this.hostname}/api/track?id=` + this.id);
 		const edit = document.getElementById("edit") as HTMLElement;
 		info.then((res) => res.json())
 			.then((data: DataInfo) => {
 				edit.replaceChildren(
 					this.jsxtohtml(
 						<div className="container px-5 my-5">
-							<form className="form" method="get" action={`${this.hostname}/api/edit`}>
+							<form className="form" method="get" action={`//${this.hostname}/api/edit`}>
 								{/* hidden input */}
 								<input aria-hidden="true" type="hidden" name="id" value={data.id}/>
 								<div className="mb-3">
