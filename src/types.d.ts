@@ -44,6 +44,71 @@ interface DataInfo {
 	};
 }
 
+interface TrackInfo {
+	/** How far down the level is on the playlist screen */
+	id: number;
+
+	/** Track name */
+	name: string;
+
+	/** Track author */
+	artist: string;
+
+	/** Track world/chapter */
+	world: string;
+
+	/** Amount of checkpoints */
+	checkpoints: number;
+
+	/** Is it a bossfight? */
+	boss: boolean;
+
+	/** Notes about the level */
+	notes: string;
+
+	/** Version added */
+	added: string;
+}
+
+interface RankInfo {
+	/** How far down the level is on the playlist screen */
+	id: number;
+
+	/** Rank and dash amount for normal mode */
+	normal: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
+
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
+
+	/** Rank and dash amount for hardcore mode */
+	hardcore: {
+		/** Rank (S, A, B, C, blank if unknown) */
+		rank: string;
+
+		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+		dash: number;
+	};
+}
+
+interface GetDataCallback<T> {
+	/** Was there an error? */
+	error: boolean;
+
+	/** Error message */
+	message?: Error;
+
+	/** Response from db */
+	data?: T;
+}
+
+type GetRankDataCallback = RankInfo;
+type GetTrackDataCallback = TrackInfo;
+type GetAllTracksDataCallback = TrackInfo[];
+type GetFullTracksDataCallback = DataInfo[];
+
 interface AppState {
 	/** Initial server response */
 	res: {
@@ -81,5 +146,37 @@ interface PartialConfig {
 	apiport: number;
 	vitehost: string;
 	viteport: number;
+}
+
+/**
+ * **Warning**: not all function names make sense. Use the JSDoc comments to help.
+ */
+interface Data {
+	/** Sets the rank data for a specific song. */
+	setUserTrackData(userid: string, data: RankInfo, id: number): Promise<void>;
+
+	/** Gets full user tracks data. */
+	getUserTrackData(userid: string): Promise<RankInfo[]>;
+
+	/** Gets the info of a track for a user */
+	getUserTrackInfo(userid: string, trackid: number): Promise<RankInfo>;
+
+	/** Gets the info about a track */
+	getTrackInfo(id: number): Promise<TrackInfo>;
+
+	/** Gets all tracks */
+	getAllTracksInfo(): Promise<TrackInfo[]>;
+
+	/** Gets the full info (track data and rank data) from all tracks for a user */
+	getFullTracksInfo(userid: string): Promise<DataInfo[]>;
+
+	/** Gets the full info (track data and rank data) from a single track */
+	getSingleFullTrackInfo(userid: string, trackid: number): Promise<DataInfo>;
+}
+
+interface LoginManager {
+	loggedin(): boolean;
+	sendLoginRedirect(p: "github" | "google" | "email"): Promise<void>;
+	sendSignupRedirect(p: "github" | "google" | "email"): Promise<void>;
 }
 

@@ -17,7 +17,11 @@ const original = JSON.parse(fs.readFileSync(path.join(__dirname, "levels.json"),
 let data = JSON.parse(fs.readFileSync(path.join(__dirname, "info.json"), "utf8"));
 
 function set(id, normalRank, normalDash, hardcoreRank, hardcoreDash) {
-	data[Number(id)] = { ...data[Number(id)], normal: { rank: normalRank, dash: Number(normalDash) }, hardcore: { rank: hardcoreRank, dash: Number(hardcoreDash) } };
+	data[Number(id)] = {
+		...data[Number(id)],
+		normal: { rank: normalRank, dash: Number(normalDash) },
+		hardcore: { rank: hardcoreRank, dash: Number(hardcoreDash) },
+	};
 }
 
 function save() {
@@ -55,7 +59,7 @@ app.get("/api/edit", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	try {
 		console.log(req.query);
-		debugger
+		debugger;
 		set(req.query.id - 1, req.query.normalRank, req.query.normalDash, req.query.hardcoreRank, req.query.hardcoreDash);
 		save();
 		// deepcode ignore OR
@@ -67,16 +71,13 @@ app.get("/api/edit", (req, res) => {
 
 app.get("/api/track", (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
-	let sent = false;
-	data.forEach((e) => {
-		if (`${e.id}` === req.query.id) {
-			res.json(e);
-			sent = true;
-		}
-	});
-	if (!sent) {
-		res.json({ error: true, message: "No data found" });
+
+	if (data[req.query.id] !== undefined) {
+		res.json(data[req.query.id]);
+		return;
 	}
+
+	res.json({ error: true, message: "No data found with that id" });
 });
 
 app.get("/api/get", (req, res) => {

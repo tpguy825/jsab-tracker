@@ -1,13 +1,13 @@
 // file deepcode ignore ReactEventHandlerThis, file deepcode ignore ReactMissingCleanup
-import $ from "jquery";
 import Button from "./Button";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import EditScreen from "./EditScreen";
+import { Data, db, getEmail, getLocalStorage, getUid, logout, setLocalStorage } from "./DataManager";
+import { get, ref } from "firebase/database";
 
 export default class App extends React.Component {
 	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never" };
-	getdata: (callback: (data: DataInfo[]) => any) => void;
 	hostname: string;
 
 	constructor(props: {}) {
@@ -15,13 +15,9 @@ export default class App extends React.Component {
 
 		this.hostname = location.hostname === "localhost" ? "http://localhost:80" : location.hostname;
 
-		if (localStorage.getItem("screen") !== "1" && localStorage.getItem("screen") !== "0") {
-			localStorage.setItem("screen", "0");
+		if (getLocalStorage("screen") !== "1" && getLocalStorage("screen") !== "0") {
+			setLocalStorage("screen", "0");
 		}
-
-		this.getdata = (callback: (data: DataInfo[]) => any) => {
-			$.get(`//${this.hostname}/api/get`, callback);
-		};
 	}
 
 	getTable() {
@@ -29,47 +25,51 @@ export default class App extends React.Component {
 
 		let table = tablebody as HTMLElement;
 
-		this.getdata((data) => {
-			let html: HTMLElement[] = [];
-			let jsx = <span>Loading...</span>;
-			data.forEach((row) => {
-				jsx = (
-					<>
-						<th scope="row">{row.id}</th>
-						<td>{row.name}</td>
-						<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
-						<td>{this.parsedash(row.normal.dash)}</td>
-						<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
-						<td>{this.parsedash(row.hardcore.dash)}</td>
-						<td>
-							<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
-								Edit
-							</button>
-						</td>
-					</>
-				);
-				html.push(this.jsxtohtml(jsx, "tr"));
-				table.innerHTML = "";
-			});
-			html.forEach((el) => {
-				table.appendChild(el);
-				el.addEventListener("click", (ev) => {
-					this.gotoedit(ev.target as HTMLElement);
+		Data.getFullTracksInfo(getUid())
+			.then((data) => {
+				let html: HTMLElement[] = [];
+				let jsx = <span>Loading...</span>;
+				data.forEach((row) => {
+					jsx = (
+						<>
+							<th scope="row">{row.id}</th>
+							<td>{row.name}</td>
+							<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
+							<td>{this.parsedash(row.normal.dash)}</td>
+							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
+							<td>{this.parsedash(row.hardcore.dash)}</td>
+							<td>
+								<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
+									Edit
+								</button>
+							</td>
+						</>
+					);
+					html.push(this.jsxtohtml(jsx, "tr"));
+					table.innerHTML = "";
 				});
-			});
+				html.forEach((el) => {
+					table.appendChild(el);
+					el.addEventListener("click", (ev) => {
+						this.gotoedit(ev.target as HTMLElement);
+					});
+				});
 
-			this.setState({ ...this.state, lastrefreshed: new Date() });
-		});
+				this.setState({ ...this.state, lastrefreshed: new Date() });
+			})
+			.catch((err) => {
+				console.error(err);
+			});
 	}
 
 	gotoedit(row: HTMLElement) {
-		localStorage.setItem("screen", "1");
+		setLocalStorage("screen", "1");
 		location.href = `/?id=${row.dataset.id}`;
 	}
 
 	componentDidMount(): void {
 		try {
-			if (this.testscreen(localStorage.getItem("screen") as string) === 0) {
+			if (this.testscreen(getLocalStorage("screen") as string) === 0) {
 				this.getTable();
 			}
 		} catch (e) {
@@ -119,16 +119,20 @@ export default class App extends React.Component {
 			case 1:
 				return <EditScreen />;
 			default:
-
 				return (
 					<div className="container">
-						<div>
-							<span>
-								Last refreshed: {this.state.lastrefreshed.toString()}
+						<div className="row">
+							<div className="col-2">
 								<Button id="refreshbutton" onClick={this.getTable}>
 									Refresh
 								</Button>
-							</span>
+							</div>
+							<div className="col text-end">
+								Logged in as {getEmail()}. Not you?{" "}
+								<button className="btn btn-primary" onClick={logout} type="button">
+									Log out
+								</button>
+							</div>
 						</div>
 						<table className="table">
 							<thead>
@@ -161,7 +165,7 @@ export default class App extends React.Component {
 	}
 
 	render() {
-		return this.getScreen(this.testscreen(localStorage.getItem("screen") as string));
+		return this.getScreen(this.testscreen(getLocalStorage("screen") as string));
 	}
 }
 

@@ -1,5 +1,6 @@
 // Import all of Bootstrap's CSS
 @import "~bootstrap/scss/bootstrap";
+@import "~bootstrap-icons/font/bootstrap-icons";
 
 .help {
 	cursor: help;
@@ -29,4 +30,31 @@
 
 .editbutton {
 	margin: 3px;
+}
+
+.login-button {
+	margin: 5px;
+}
+
+.github-login {
+	color: #fff;
+	background-color: #24292e;
+}
+
+.google-login {
+	color: #fff;
+	background-color: #c9c9c9;
+}
+
+.google-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.login-error {
+	color: rgb(255, 75, 75);
+}
+
+.signupbutton {
+	margin: 5px;
 }
