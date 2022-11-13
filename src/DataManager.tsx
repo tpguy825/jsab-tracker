@@ -4,13 +4,13 @@ import { get, ref, getDatabase, set } from "firebase/database";
 import {
 	getAuth,
 	signInWithPopup,
-	GithubAuthProvider,
-	OAuthCredential,
-	GoogleAuthProvider,
 	AuthProvider,
 	User,
-	UserCredential,
 	linkWithPopup,
+	GithubAuthProvider,
+	GoogleAuthProvider,
+	TwitterAuthProvider,
+	FacebookAuthProvider,
 } from "firebase/auth";
 import firebaseConfig from "./FirebaseConfig";
 
@@ -18,38 +18,45 @@ import firebaseConfig from "./FirebaseConfig";
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const db = getDatabase(app);
+const auth = getAuth(app);
 
 export const LoginManager: LoginManager = {
 	loggedin() {
 		return getLocalStorage("loggedin") === "true";
 	},
 
-	async sendLoginRedirect(p: "github" | "google" | "email") {
-		let provider, oauth;
+	login: "any",
+
+	async sendLoginRedirect(p) {
+		let provider;
 		if (p === "github") {
 			provider = GithubAuthProvider;
-			oauth = true;
 		} else if (p === "google") {
 			provider = GoogleAuthProvider;
-			oauth = true;
+		} else if (p === "facebook") {
+			provider = FacebookAuthProvider;
 		} else {
 			throw new Error("Unknown provider. This should never happen.");
 			return;
 		}
-		const auth = getAuth(app);
+
 		try {
 			let result = await signInWithPopup(auth, new provider() as AuthProvider);
-			let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
+			// let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
+
+			console.log(getDatabase(getAuth(app).app));
+			await auth.updateCurrentUser(result.user).catch((e) => {
+				console.error(e);
+			});
 
 			// The signed-in user info.
 			let user: User = result.user;
-			// This gives you a GitHub Access Token. You can use it to access the GitHub API.
 
 			console.log({ custommessage: `Welcome, ${user.displayName} [${user.email}]`, result });
 			setLocalStorage("loggedin", "true");
 			setLocalStorage("email", user.email as string);
 			setLocalStorage("uid", user.uid);
-			// location.reload();
+			location.reload();
 		} catch (e: any) {
 			let error = e as FirebaseError;
 
@@ -81,64 +88,41 @@ export const LoginManager: LoginManager = {
 				return;
 			}
 
-			errorhtml.innerText = `Error: ${errorMessage}`;
+			errorhtml.innerText = errorMessage;
 		}
 	},
 
-	async sendSignupRedirect(p) {
-		let provider;
-		if (p === "github") {
-			provider = GithubAuthProvider;
-		} else if (p === "google") {
-			provider = GoogleAuthProvider;
-		} else {
-			throw new Error("Unknown provider. This should never happen.");
-			return;
-		}
-		const auth = getAuth(app);
-		try {
-			let credential: OAuthCredential | UserCredential;
-			let result = await signInWithPopup(auth, new provider());
-			credential = provider.credentialFromResult(result) as OAuthCredential;
-			console.log({ custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`, credential, result });
-
-			setLocalStorage("loggedin", "true");
-			setLocalStorage("email", result.user.email as string);
-			location.reload();
-		} catch (e: any) {
-			let error = e as FirebaseError;
-
-			// Handle Errors here.
-			const errorCode = error.code;
-			const errorMessage = error.message;
-			// The email of the user's account used.
-			const email = error.customData?.email as string;
-			let errorhtml = document.getElementById("error") as HTMLSpanElement;
-
-			if (errorCode === "popup_closed_by_user") {
-				errorhtml.innerText = "Login cancelled by user";
-				return;
+	cloneDefaultUserTemplate() {
+		get(ref(db, "defaultUserTemplate")).then((snapshot) => {
+			if (snapshot.exists()) {
+				set(ref(db, `users/${getLocalStorage("uid")}`), snapshot.val());
+			} else {
+				console.error("No data available");
 			}
-
-			if (errorCode === "auth/argument-error") {
-				errorhtml.innerText = "Hmm... Something went wrong. Double-check your email and password.";
-			}
-
-			if (errorCode === "auth/account-exists-with-different-credential") {
-				linkWithPopup(auth.currentUser as User, new provider()).catch((error) => {
-					errorhtml.innerText = error.message;
-				});
-			}
-		}
+		});
 	},
 };
 
 export const Data: Data = {
+	waitForUserAuthenticated() {
+		return new Promise((resolve, reject) => {
+			auth.onAuthStateChanged((user) => {
+				if (user) {
+					resolve(user);
+				} else {
+					reject();
+				}
+			}, reject);
+		});
+	},
+
 	async setUserTrackData(userid, data, id) {
+		await Data.waitForUserAuthenticated();
 		return set(ref(db, `users/${userid}/ranks/${id}`), data);
 	},
 
 	async getUserTrackData(userid) {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks`));
 		if (snapshot.exists()) {
 			return snapshot.val();
@@ -148,6 +132,7 @@ export const Data: Data = {
 	},
 
 	async getUserTrackInfo(userid, trackid) {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks/${trackid}`));
 		if (snapshot.exists()) {
 			return snapshot.val();
@@ -157,6 +142,7 @@ export const Data: Data = {
 	},
 
 	async getTrackInfo(id) {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `tracks/${id}`));
 
 		if (snapshot.exists()) {
@@ -167,6 +153,7 @@ export const Data: Data = {
 	},
 
 	async getAllTracksInfo() {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `tracks`));
 
 		if (snapshot.exists()) {
@@ -177,6 +164,7 @@ export const Data: Data = {
 	},
 
 	async getFullTracksInfo(userid: string) {
+		await Data.waitForUserAuthenticated();
 		const trackinfo = await this.getAllTracksInfo();
 		const userdataforid = await this.getUserTrackData(userid);
 
@@ -185,7 +173,7 @@ export const Data: Data = {
 		trackinfo.forEach((track, i) => {
 			full.push({
 				...track,
-				...userdataforid[i+1],
+				...userdataforid[i + 1],
 			});
 		});
 
@@ -193,6 +181,7 @@ export const Data: Data = {
 	},
 
 	async getSingleFullTrackInfo(userid: string, trackid: number) {
+		await Data.waitForUserAuthenticated();
 		const trackinfo = await this.getTrackInfo(trackid);
 		const userdataforid = await this.getUserTrackInfo(userid, trackid);
 
@@ -233,4 +222,16 @@ export async function cloneDefaultUserTemplate(userid: string) {
 	} else {
 		throw new Error("Failed to clone default user template. This should never happen.");
 	}
+}
+
+export function getValidatedUser() {
+	return new Promise((resolve, reject) => {
+		const unsubscribe = auth.onAuthStateChanged(
+			(user) => {
+				unsubscribe();
+				resolve(user);
+			},
+			reject // pass up any errors attaching the listener
+		);
+	});
 }

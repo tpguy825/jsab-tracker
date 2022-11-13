@@ -152,6 +152,13 @@ interface PartialConfig {
  * **Warning**: not all function names make sense. Use the JSDoc comments to help.
  */
 interface Data {
+	/** Usage:
+```javascript
+const user = await Data.waitForUserAuthenticated()
+// `user` is of type `User`
+``` */
+	waitForUserAuthenticated(): Promise<User>;
+
 	/** Sets the rank data for a specific song. */
 	setUserTrackData(userid: string, data: RankInfo, id: number): Promise<void>;
 
@@ -175,8 +182,9 @@ interface Data {
 }
 
 interface LoginManager {
+	login: any;
 	loggedin(): boolean;
-	sendLoginRedirect(p: "github" | "google" | "email"): Promise<void>;
-	sendSignupRedirect(p: "github" | "google" | "email"): Promise<void>;
+	sendLoginRedirect(p: "github" | "google" | "facebook"): Promise<void>;
+	cloneDefaultUserTemplate(): void;
 }
 

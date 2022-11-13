@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import EditScreen from "./EditScreen";
 import { Data, db, getEmail, getLocalStorage, getUid, logout, setLocalStorage } from "./DataManager";
 import { get, ref } from "firebase/database";
+import { getAuth } from "firebase/auth";
 
 export default class App extends React.Component {
 	state: AppState = { res: { data: "Waiting" }, table: [], tablejsx: [], lastrefreshed: "Never" };
@@ -34,10 +35,10 @@ export default class App extends React.Component {
 						<>
 							<th scope="row">{row.id}</th>
 							<td>{row.name}</td>
-							<td>{row.normal.rank === "" ? "Unknown" : row.normal.rank}</td>
-							<td>{this.parsedash(row.normal.dash)}</td>
-							<td>{row.hardcore.rank === "" ? "Unknown" : row.hardcore.rank}</td>
-							<td>{this.parsedash(row.hardcore.dash)}</td>
+							{row.normal.rank === "" ? <td className="unknown">Unknown</td> : <td>{row.normal.rank}</td>}
+							{this.parsedash(row.normal.dash)}
+							{row.hardcore.rank === "" ? <td className="unknown">Unknown</td> : <td>{row.hardcore.rank}</td>}
+							{this.parsedash(row.hardcore.dash)}
 							<td>
 								<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
 									Edit
@@ -50,9 +51,17 @@ export default class App extends React.Component {
 				});
 				html.forEach((el) => {
 					table.appendChild(el);
-					el.addEventListener("click", (ev) => {
-						this.gotoedit(ev.target as HTMLElement);
-					});
+
+					for (let i = 0; i < el.children.length; i++) {
+						const buttonmaybe = el.children[i];
+
+						if (buttonmaybe.children[0] !== undefined && buttonmaybe.children[0].nodeName === "BUTTON") {
+							const button = buttonmaybe.children[0] as HTMLButtonElement;
+							button.addEventListener("click", (ev) => {
+								this.gotoedit(ev.target as HTMLElement);
+							});
+						}
+					}
 				});
 
 				this.setState({ ...this.state, lastrefreshed: new Date() });
@@ -67,7 +76,7 @@ export default class App extends React.Component {
 		location.href = `/?id=${row.dataset.id}`;
 	}
 
-	componentDidMount(): void {
+	componentDidMount() {
 		try {
 			if (this.testscreen(getLocalStorage("screen") as string) === 0) {
 				this.getTable();
@@ -81,19 +90,19 @@ export default class App extends React.Component {
 	parsedash(dash: number) {
 		switch (dash) {
 			case 0:
-				return "No Dash";
+				return <td>No Dash</td>;
 
 			case 1:
-				return "Slow Poke (1-9)";
+				return <td>Slow Poke (1-9)</td>;
 
 			case 2:
-				return "10+";
+				return <td>10+</td>;
 
 			case 3:
-				return "Unknown";
+				return <td className="unknown">Unknown</td>;
 
 			default:
-				return "Error";
+				return <td className="error">Error</td>;
 		}
 	}
 
@@ -123,7 +132,12 @@ export default class App extends React.Component {
 					<div className="container">
 						<div className="row">
 							<div className="col-2">
-								<Button id="refreshbutton" onClick={this.getTable}>
+								{/* <Button id="refreshbutton" onClick={this.getTable}> */}
+								<Button
+									id="refreshbutton"
+									onClick={() => {
+										console.log(getAuth(db.app).currentUser);
+									}}>
 									Refresh
 								</Button>
 							</div>

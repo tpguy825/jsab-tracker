@@ -5,6 +5,20 @@
 	cursor: help;
 }
 
+body,
+td,
+tr,
+.form-select {
+	// background-color: #222222;
+	background-color: $gray-900;
+	color: $gray-100;
+	// color: $bs-grey-200 !important;
+}
+
+.unknown {
+	color: $gray-500 !important;
+}
+
 .container {
 	margin-top: 10px;
 }
@@ -46,14 +60,16 @@
 }
 
 .google-icon {
+	background-image: url(assets/google-icon.svg);
 	width: 16px;
 	height: 16px;
 }
 
-.login-error {
+.error {
 	color: rgb(255, 75, 75);
 }
 
 .signupbutton {
 	margin: 5px;
 }
+

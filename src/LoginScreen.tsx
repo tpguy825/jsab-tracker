@@ -1,6 +1,6 @@
 import React from "react";
 import { LoginManager } from "./DataManager";
-import { Github, Google } from "./footer/Icons";
+import { Facebook, Github, Google, Twitter } from "./footer/Icons";
 
 export default class LoginScreen extends React.Component {
 	render() {
@@ -26,6 +26,15 @@ export default class LoginScreen extends React.Component {
 						{Google} Log in with Google
 					</button>
 					<br />
+					<button
+						type="button"
+						className="btn btn-primary facebook-login login-button"
+						onClick={() => {
+							LoginManager.sendLoginRedirect("facebook");
+						}}>
+						{Facebook} Log in with Facebook
+					</button>
+					<br />
 					<span>
 						Want another provider on here?{" "}
 						<a rel="noopener" target="_blank" href="https://github.com/tpguy825/jsab-tracker/issues/new">
@@ -34,7 +43,7 @@ export default class LoginScreen extends React.Component {
 					</span>
 
 					<br />
-					<span id="error" className="login-error"></span>
+					<span id="error" className="error"></span>
 				</span>
 			</div>
 		);

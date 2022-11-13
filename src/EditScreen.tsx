@@ -145,8 +145,6 @@ export default class EditScreen extends React.Component {
 
 	editformloop(id: number) {
 		if ($("#edit-form")[0] !== undefined) {
-			console.log("Wooooo!");
-			console.log($("#edit-form"));
 			$("#edit-form")
 				.get()
 				.forEach((el) => {
