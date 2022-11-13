@@ -1,5 +1,6 @@
 import React from "react";
 import { LoginManager } from "./DataManager";
+import { Github, Google } from "./footer/Icons";
 
 export default class LoginScreen extends React.Component {
 	render() {
@@ -13,7 +14,7 @@ export default class LoginScreen extends React.Component {
 						onClick={() => {
 							LoginManager.sendLoginRedirect("github");
 						}}>
-						<i className="bi bi-github"></i> Log in with GitHub
+						{Github} Log in with GitHub
 					</button>
 					<br />
 					<button
@@ -22,7 +23,7 @@ export default class LoginScreen extends React.Component {
 						onClick={() => {
 							LoginManager.sendLoginRedirect("google");
 						}}>
-						<i className="bi bi-google"></i> Log in with Google
+						{Google} Log in with Google
 					</button>
 					<br />
 					<span>

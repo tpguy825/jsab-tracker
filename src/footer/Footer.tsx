@@ -1,5 +1,4 @@
-import Icons from "./FooterIcons";
-const { Heart, Twitter, Youtube, Github, Code } = Icons;
+import { Heart, Twitter, Youtube, Github, Code } from "./Icons";
 
 /**
  * General footer for the website
