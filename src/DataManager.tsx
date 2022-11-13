@@ -182,8 +182,8 @@ export const Data: Data = {
 
 	async getSingleFullTrackInfo(userid: string, trackid: number) {
 		await Data.waitForUserAuthenticated();
-		const trackinfo = await this.getTrackInfo(trackid);
-		const userdataforid = await this.getUserTrackInfo(userid, trackid-1);
+		const trackinfo = await this.getTrackInfo(trackid-1);
+		const userdataforid = await this.getUserTrackInfo(userid, trackid);
 
 		return {
 			...trackinfo,
