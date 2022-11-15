@@ -110,26 +110,11 @@ type GetAllTracksDataCallback = TrackInfo[];
 type GetFullTracksDataCallback = DataInfo[];
 
 interface AppState {
-	/** Initial server response */
-	res: {
-		/** Returned data */
-		data: string;
-		timeout?: NodeJS.Timer;
-	};
-
 	/** Array of levels and their info */
 	table: DataInfo[];
 
 	/** JSX for the main table */
 	tablejsx: JSX.Element[];
-
-	/** Time since the table was last updated */
-	lastrefreshed: Date | string;
-}
-
-interface EditProps {
-	pstate: AppState;
-	psetState: React.Dispatch<React.SetStateAction<AppState>>;
 }
 
 interface Config {
@@ -152,7 +137,8 @@ interface PartialConfig {
  * **Warning**: not all function names make sense. Use the JSDoc comments to help.
  */
 interface Data {
-	/** Usage:
+	/** Used to wait until a user has been authenticated.
+	 * Usage:
 ```javascript
 const user = await Data.waitForUserAuthenticated()
 // `user` is of type `User`
@@ -179,12 +165,31 @@ const user = await Data.waitForUserAuthenticated()
 
 	/** Gets the full info (track data and rank data) from a single track */
 	getSingleFullTrackInfo(userid: string, trackid: number): Promise<DataInfo>;
+
+	/** Clones the default user template for a new user */
+	cloneDefaultUserTemplate(userid: string): Promise<void>;
 }
 
 interface LoginManager {
 	login: any;
 	loggedin(): boolean;
 	sendLoginRedirect(p: "github" | "google" | "facebook"): Promise<void>;
-	cloneDefaultUserTemplate(): void;
 }
 
+interface URLManager {
+	/** Centralised method of redirecting */
+	goto(url: string): void;
+
+	/** Gets current hostname. Returns the same as `location.href` */
+	gethostname(): string;
+
+	/** Gets current query. Returns the same as `location.query` */
+	getquery(): string;
+
+	/** Reloads the page */
+	reload(): void;
+}
+
+interface EditScreenProps {
+	id: number;
+}

@@ -1,43 +1,34 @@
-// file deepcode ignore ReactIncorrectReturnValue, file deepcode ignore DOMXSS, file deepcode ignore ReactDeprecatedElementProp
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Data, getLocalStorage, getUid, setLocalStorage } from "./DataManager";
+import { Data, getUid, URLManager } from "./DataManager";
 import $ from "jquery";
 
-export default class EditScreen extends React.Component {
-	id: number;
+export default class EditScreen extends React.Component<EditScreenProps> {
+	declare props: EditScreenProps;
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
-	screen: number;
 	hostname: string;
 
-	constructor(props: {}) {
+	constructor(props: EditScreenProps) {
 		super(props);
-		this.hostname = location.hostname === "localhost" ? "http://localhost:80" : location.hostname;
-		let screen = Number(getLocalStorage("screen") as string);
-		this.screen = screen || 0;
+		this.hostname = URLManager.gethostname() === "localhost" ? "http://localhost:80" : URLManager.gethostname();
 
-		let params = new URLSearchParams(window.location.search).get("id");
+		let params = new URLSearchParams(URLManager.getquery()).get("id");
 		if (!params) {
 			params = "0";
 		}
-		this.id = Number(params);
-		if (this.id < 1 || this.id > 54) {
+		this.props.id = Number(params);
+		if (this.props.id < 1 || this.props.id > 54) {
 			this.gotomain();
 		}
 	}
 
 	componentDidMount(): void {
-		if (this.screen !== 1) {
-			this.gotomain();
-		}
-
 		this.form();
 	}
 
 	gotomain() {
-		setLocalStorage("screen", "0");
-		location.href = "/";
+		URLManager.goto("/");
 	}
 
 	jsxtohtml(jsx: JSX.Element, type: string = "div") {
@@ -49,7 +40,7 @@ export default class EditScreen extends React.Component {
 
 	form() {
 		const edit = document.getElementById("edit") as HTMLElement;
-		Data.getSingleFullTrackInfo(getUid(), this.id).then((data) => {
+		Data.getSingleFullTrackInfo(getUid(), this.props.id).then((data) => {
 			edit.replaceChildren(
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
@@ -140,7 +131,7 @@ export default class EditScreen extends React.Component {
 				)
 			);
 		});
-		this.editformloop(this.id);
+		this.editformloop(this.props.id);
 	}
 
 	editformloop(id: number) {
@@ -156,7 +147,7 @@ export default class EditScreen extends React.Component {
 							const normalDash = document.getElementById("normalDash") as HTMLSelectElement;
 							const hardcoreRank = document.getElementById("hardcoreRank") as HTMLSelectElement;
 							const hardcoreDash = document.getElementById("hardcoreDash") as HTMLSelectElement;
-					
+
 							const data = {
 								id: id,
 								normal: {
@@ -168,14 +159,12 @@ export default class EditScreen extends React.Component {
 									dash: Number(hardcoreDash.value),
 								},
 							};
-					
+
 							Data.setUserTrackData(getUid(), data, id).then(() => {
-								setLocalStorage("screen", "0");
-								location.href = "/";
+								this.gotomain();
 							});
 						} else if (clickedElement && clickedElement.id === "cancelButton") {
-							setLocalStorage("screen", "0");
-							location.href = "/";
+							this.gotomain();
 						}
 					});
 				});
