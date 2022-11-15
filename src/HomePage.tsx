@@ -1,4 +1,5 @@
 import JSABLogo from "./assets/jsab-icon.png";
+import { ExternalLink } from "./footer/Icons";
 
 export default function HomePage() {
 	return (
@@ -24,12 +25,12 @@ export default function HomePage() {
 							</li>
 							<li className="nav-item">
 								<a rel="noopener" target="_blank" className="nav-link" href="https://github.com/tpguy825/jsab-tracker/issues">
-									Problem?
+									Problem? {ExternalLink}
 								</a>
 							</li>
 							<li className="nav-item">
 								<a rel="noopener" target="_blank" className="nav-link" href="https://www.justshapesandbeats.com/">
-									Get JSAB
+									Get JSAB {ExternalLink}
 								</a>
 							</li>
 						</ul>
@@ -38,8 +39,12 @@ export default function HomePage() {
 				<hr />
 			</nav>
 			<div className="container text-center">
-				<h1>JSAB Tracker</h1>
-				<p>Welcome to the JSAB Tracker!</p>
+				<p>Welcome! This page is still under construction, so stop by later!</p>
+				<a href="/login">
+					<button type="button" className="btn btn-primary">
+						Log in
+					</button>
+				</a>
 			</div>
 		</>
 	);
