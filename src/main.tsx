@@ -14,7 +14,6 @@ import "./index.scss";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
 	setLocalStorage("loggedin", "false");
-	URLManager.goto("/login");
 }
 
 // use react router
