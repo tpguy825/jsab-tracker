@@ -137,12 +137,17 @@ interface PartialConfig {
  * **Warning**: not all function names make sense. Use the JSDoc comments to help.
  */
 interface Data {
-	/** Used to wait until a user has been authenticated.
-	 * Usage:
-```javascript
-const user = await Data.waitForUserAuthenticated()
-// `user` is of type `User`
-``` */
+	/** ```javascript
+	 * // Used to wait until a user has been authenticated.
+	 * // Firebase auth is async, so this is used to wait until it's done.
+	 * // Usage:
+	 * 
+	 * const user = await Data.waitForUserAuthenticated()
+	 * 
+	 * // User has now been authenticated
+	 * // `user` is of type `User`
+	 * ```
+	 * */
 	waitForUserAuthenticated(): Promise<User>;
 
 	/** Sets the rank data for a specific song. */
@@ -173,7 +178,7 @@ const user = await Data.waitForUserAuthenticated()
 interface LoginManager {
 	login: any;
 	loggedin(): boolean;
-	sendLoginRedirect(p: "github" | "google" | "facebook"): Promise<void>;
+	sendLoginRedirect(p: "github" | "google"): Promise<void>;
 }
 
 interface URLManager {
@@ -190,6 +195,30 @@ interface URLManager {
 	reload(): void;
 }
 
-interface EditScreenProps {
-	id: number;
+interface Utils {
+	/** Gets the email of the logged in user */
+	getEmail(): string | null;
+
+	/** Gets the user id of the logged in user */
+	getUid(): string | null;
+
+	/** Logs out current user */
+	logout(): void;
+
+	/** Centralised way of setting values in LocalStorage
+	 * ```javascript
+	 * Utils.setLocalStorage("key", "value")
+	 * // is the same as
+	 * localStorage.setItem("key", "value")
+	 * ``` */
+	setLocalStorage(key: string, value: string): void;
+
+	/** Centralised way of getting values from LocalStorage
+	* ```javascript
+	* Utils.getLocalStorage("key")
+	* // is the same as
+	* localStorage.getItem("key")
+	* ``` */
+	getLocalStorage(key: string): string | null;
 }
+

@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Data, getUid, URLManager } from "./DataManager";
+import { Data, URLManager, Utils } from "./DataManager";
 import $ from "jquery";
 
 export default class EditScreen extends React.Component {
@@ -44,7 +44,7 @@ export default class EditScreen extends React.Component {
 
 	form() {
 		const edit = document.getElementById("edit") as HTMLElement;
-		Data.getSingleFullTrackInfo(getUid(), this.state.id).then((data) => {
+		Data.getSingleFullTrackInfo(Utils.getUid() as string, this.state.id).then((data) => {
 			edit.replaceChildren(
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
@@ -172,7 +172,7 @@ export default class EditScreen extends React.Component {
 								},
 							};
 
-							Data.setUserTrackData(getUid(), data, id).then(() => {
+							Data.setUserTrackData(Utils.getUid() as string, data, id).then(() => {
 								this.gotomain();
 							});
 						} else if (clickedElement && clickedElement.id === "cancelButton") {

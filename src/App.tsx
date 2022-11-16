@@ -1,8 +1,8 @@
 // file deepcode ignore ReactEventHandlerThis, file deepcode ignore ReactMissingCleanup
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Data, getEmail, getUid, logout, URLManager } from "./DataManager";
-import JSABS from "./assets/jsab-s.png"
+import { Data, LoginManager, URLManager, Utils } from "./DataManager";
+import JSABS from "./assets/jsab-s.png";
 
 export default class App extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
@@ -19,7 +19,7 @@ export default class App extends React.Component {
 
 		let table = tablebody as HTMLElement;
 
-		const data = await Data.getFullTracksInfo(getUid());
+		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
 		let html: HTMLElement[] = [];
 		let jsx = <span>Loading...</span>;
 		data.forEach((row) => {
@@ -30,7 +30,9 @@ export default class App extends React.Component {
 					{row.normal.rank === "" ? (
 						<td className="unknown">Unknown</td>
 					) : row.normal.rank === "S" ? (
-						<td><img src={JSABS} alt="S" className="s-rank" /></td>
+						<td>
+							<img src={JSABS} alt="S" className="s-rank" />
+						</td>
 					) : (
 						<td>{row.normal.rank}</td>
 					)}
@@ -38,7 +40,9 @@ export default class App extends React.Component {
 					{row.hardcore.rank === "" ? (
 						<td className="unknown">Unknown</td>
 					) : row.hardcore.rank === "S" ? (
-						<td><img src={JSABS} alt="S" className="s-rank" /></td>
+						<td>
+							<img src={JSABS} alt="S" className="s-rank" />
+						</td>
 					) : (
 						<td>{row.hardcore.rank}</td>
 					)}
@@ -110,6 +114,11 @@ export default class App extends React.Component {
 	}
 
 	render() {
+		if (!LoginManager.loggedin()) {
+			URLManager.goto("/login");
+			return <span>Redirecting to login page...</span>;
+		}
+
 		return (
 			<div className="container">
 				<div className="row">
@@ -119,8 +128,8 @@ export default class App extends React.Component {
 						</button>
 					</div>
 					<div className="col text-end">
-						Logged in as {getEmail()}. Not you?{" "}
-						<button className="btn btn-primary" onClick={logout} type="button">
+						Logged in as {Utils.getEmail()}. Not you?{" "}
+						<button className="btn btn-primary" onClick={Utils.logout} type="button">
 							Log out
 						</button>
 					</div>

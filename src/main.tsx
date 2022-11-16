@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "bootstrap";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import { LoginManager, setLocalStorage } from "./DataManager";
+import { LoginManager, Utils } from "./DataManager";
 
 import App from "./App";
 import Footer from "./footer/Footer";
@@ -13,7 +13,7 @@ import HomePage from "./HomePage";
 import "./index.scss";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
-	setLocalStorage("loggedin", "false");
+	Utils.setLocalStorage("loggedin", "false");
 }
 
 // use react router

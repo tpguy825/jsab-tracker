@@ -23,7 +23,7 @@ const auth = getAuth(app);
 
 export const LoginManager: LoginManager = {
 	loggedin() {
-		return getLocalStorage("loggedin") === "true";
+		return Utils.getLocalStorage("loggedin") === "true";
 	},
 
 	login: "any",
@@ -34,8 +34,6 @@ export const LoginManager: LoginManager = {
 			provider = GithubAuthProvider;
 		} else if (p === "google") {
 			provider = GoogleAuthProvider;
-		} else if (p === "facebook") {
-			provider = FacebookAuthProvider;
 		} else {
 			throw new Error("Unknown provider. This should never happen.");
 			return;
@@ -52,9 +50,9 @@ export const LoginManager: LoginManager = {
 			let user = result.user;
 
 			console.log(`Welcome, ${user.displayName} [${user.email}]`);
-			setLocalStorage("loggedin", "true");
-			setLocalStorage("email", user.email as string);
-			setLocalStorage("uid", user.uid);
+			Utils.setLocalStorage("loggedin", "true");
+			Utils.setLocalStorage("email", user.email as string);
+			Utils.setLocalStorage("uid", user.uid);
 			URLManager.goto("/main");
 		} catch (e: any) {
 			let error = e as FirebaseError;
@@ -76,9 +74,9 @@ export const LoginManager: LoginManager = {
 				try {
 					const result = await linkWithPopup(auth.currentUser as User, new provider());
 					console.log({ custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`, result });
-					setLocalStorage("email", result.user.email as string);
-					setLocalStorage("uid", result.user.uid);
-					setLocalStorage("loggedin", "true");
+					Utils.setLocalStorage("email", result.user.email as string);
+					Utils.setLocalStorage("uid", result.user.uid);
+					Utils.setLocalStorage("loggedin", "true");
 					URLManager.goto("/main");
 				} catch (error: any) {
 					errorhtml.innerText = error.message;
@@ -213,37 +211,28 @@ export const URLManager: URLManager = {
 	},
 };
 
-export function getEmail() {
-	return getLocalStorage("email") as string;
-}
+/** General utilities */
+export const Utils: Utils = {
+	getEmail() {
+		return Utils.getLocalStorage("email");
+	},
 
-export function getUid() {
-	return getLocalStorage("uid") as string;
-}
+	getUid() {
+		return Utils.getLocalStorage("uid");
+	},
 
-export function logout() {
-	setLocalStorage("email", "");
-	setLocalStorage("uid", "");
-	setLocalStorage("loggedin", "false");
-	URLManager.reload();
-}
+	logout() {
+		Utils.setLocalStorage("email", "");
+		Utils.setLocalStorage("uid", "");
+		Utils.setLocalStorage("loggedin", "false");
+		URLManager.reload();
+	},
 
-export function setLocalStorage(key: string, value: string) {
-	return localStorage.setItem(key, value);
-}
+	setLocalStorage(key: string, value: string) {
+		return localStorage.setItem(key, value);
+	},
 
-export function getLocalStorage(key: string) {
-	return localStorage.getItem(key);
-}
-
-export function getValidatedUser() {
-	return new Promise((resolve, reject) => {
-		const unsubscribe = auth.onAuthStateChanged(
-			(user) => {
-				unsubscribe();
-				resolve(user);
-			},
-			reject // pass up any errors attaching the listener
-		);
-	});
-}
+	getLocalStorage(key: string) {
+		return localStorage.getItem(key);
+	},
+};
