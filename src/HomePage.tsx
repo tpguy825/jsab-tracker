@@ -5,7 +5,8 @@ export default function HomePage() {
 	return (
 		<>
 			{/* Bootstrap navbar */}
-			<nav className="navbar navbar-expand-lg navbar-light sticky-top">
+			<nav className="navbar navbar-expand-lg navbar-dark
+ sticky-top">
 				<div className="container-fluid">
 					<a rel="noopener" className="navbar-brand" href="#">
 						<img src={JSABLogo} alt="Logo" width="30" height="30" className="d-inline-block align-text-top" />
