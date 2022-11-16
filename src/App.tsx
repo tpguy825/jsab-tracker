@@ -157,7 +157,7 @@ export default class App extends React.Component {
 							</th>
 						</tr>
 					</thead>
-					<tbody id="tablebody">Loading...</tbody>
+					<tbody id="tablebody"><tr><td>Loading...</td></tr></tbody>
 				</table>
 			</div>
 		);
