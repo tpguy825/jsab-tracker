@@ -49,7 +49,7 @@ export default function HomePage() {
 				<hr />
 			</nav>
 			<div className="container text-center">
-				<p>Welcome! This page is still under construction, so stop by later!</p>
+				<p>Welcome! This home page is still under construction, so stop by later!</p>
 				<a href="/login">
 					<button type="button" className="btn btn-primary">
 						Log in
