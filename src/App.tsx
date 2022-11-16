@@ -2,6 +2,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Data, getEmail, getUid, logout, URLManager } from "./DataManager";
+import JSABS from "./assets/jsab-s.png"
 
 export default class App extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
@@ -26,9 +27,21 @@ export default class App extends React.Component {
 				<>
 					<th scope="row">{row.id}</th>
 					<td>{row.name}</td>
-					{row.normal.rank === "" ? <td className="unknown">Unknown</td> : <td>{row.normal.rank}</td>}
+					{row.normal.rank === "" ? (
+						<td className="unknown">Unknown</td>
+					) : row.normal.rank === "S" ? (
+						<td><img src={JSABS} alt="S" className="s-rank" /></td>
+					) : (
+						<td>{row.normal.rank}</td>
+					)}
 					{this.parsedash(row.normal.dash)}
-					{row.hardcore.rank === "" ? <td className="unknown">Unknown</td> : <td>{row.hardcore.rank}</td>}
+					{row.hardcore.rank === "" ? (
+						<td className="unknown">Unknown</td>
+					) : row.hardcore.rank === "S" ? (
+						<td><img src={JSABS} alt="S" className="s-rank" /></td>
+					) : (
+						<td>{row.hardcore.rank}</td>
+					)}
 					{this.parsedash(row.hardcore.dash)}
 					<td>
 						<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
@@ -58,7 +71,7 @@ export default class App extends React.Component {
 	}
 
 	gotoedit(id: string) {
-		URLManager.goto(`/edit/${id}`);
+		URLManager.goto(`/edit?id=${id}`);
 	}
 
 	async componentDidMount() {
@@ -73,7 +86,7 @@ export default class App extends React.Component {
 	parsedash(dash: number) {
 		switch (dash) {
 			case 0:
-				return <td>No Dash</td>;
+				return <td className="nodash">No Dash</td>;
 
 			case 1:
 				return <td>Slow Poke (1-9)</td>;
@@ -101,7 +114,7 @@ export default class App extends React.Component {
 			<div className="container">
 				<div className="row">
 					<div className="col-2">
-						<button type="button" id="refreshbutton" onClick={this.getTable}>
+						<button type="button" className="btn btn-primary" id="refreshbutton" onClick={URLManager.reload}>
 							Refresh
 						</button>
 					</div>

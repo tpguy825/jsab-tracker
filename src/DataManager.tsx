@@ -49,13 +49,13 @@ export const LoginManager: LoginManager = {
 			});
 
 			// The signed-in user info.
-			let user: User = result.user;
+			let user = result.user;
 
 			console.log(`Welcome, ${user.displayName} [${user.email}]`);
 			setLocalStorage("loggedin", "true");
 			setLocalStorage("email", user.email as string);
 			setLocalStorage("uid", user.uid);
-			URLManager.goto("/")
+			URLManager.goto("/main");
 		} catch (e: any) {
 			let error = e as FirebaseError;
 
@@ -73,17 +73,16 @@ export const LoginManager: LoginManager = {
 			}
 
 			if (errorCode === "auth/account-exists-with-different-credential") {
-				linkWithPopup(auth.currentUser as User, new provider())
-					.then((result) => {
-						console.log({ custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`, result });
-						setLocalStorage("email", result.user.email as string);
-						setLocalStorage("uid", result.user.uid);
-						setLocalStorage("loggedin", "true");
-						URLManager.goto("/")
-					})
-					.catch((error) => {
-						errorhtml.innerText = error.message;
-					});
+				try {
+					const result = await linkWithPopup(auth.currentUser as User, new provider());
+					console.log({ custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`, result });
+					setLocalStorage("email", result.user.email as string);
+					setLocalStorage("uid", result.user.uid);
+					setLocalStorage("loggedin", "true");
+					URLManager.goto("/main");
+				} catch (error: any) {
+					errorhtml.innerText = error.message;
+				}
 				return;
 			}
 
@@ -211,7 +210,7 @@ export const URLManager: URLManager = {
 
 	reload() {
 		return location.reload();
-	}
+	},
 };
 
 export function getEmail() {
@@ -226,7 +225,7 @@ export function logout() {
 	setLocalStorage("email", "");
 	setLocalStorage("uid", "");
 	setLocalStorage("loggedin", "false");
-	URLManager.reload()
+	URLManager.reload();
 }
 
 export function setLocalStorage(key: string, value: string) {

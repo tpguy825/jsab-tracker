@@ -3,23 +3,27 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Data, getUid, URLManager } from "./DataManager";
 import $ from "jquery";
 
-export default class EditScreen extends React.Component<EditScreenProps> {
-	declare props: EditScreenProps;
+export default class EditScreen extends React.Component {
+	state: { id: number };
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
-	hostname: string;
 
-	constructor(props: EditScreenProps) {
+	constructor(props: any) {
 		super(props);
-		this.hostname = URLManager.gethostname() === "localhost" ? "http://localhost:80" : URLManager.gethostname();
 
-		let params = new URLSearchParams(URLManager.getquery()).get("id");
-		if (!params) {
-			params = "0";
-		}
-		this.props.id = Number(params);
-		if (this.props.id < 1 || this.props.id > 54) {
+		this.state = { id: this.getEditID() };
+
+		if (this.state.id < 1 || this.state.id > 54) {
 			this.gotomain();
+		}
+	}
+
+	getEditID() {
+		const params = new URLSearchParams(window.location.search).get("id");
+		if (!params || Number.isNaN(Number(params))) {
+			return -1;
+		} else {
+			return Number(params);
 		}
 	}
 
@@ -28,7 +32,7 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 	}
 
 	gotomain() {
-		URLManager.goto("/");
+		URLManager.goto("/main");
 	}
 
 	jsxtohtml(jsx: JSX.Element, type: string = "div") {
@@ -40,7 +44,7 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 
 	form() {
 		const edit = document.getElementById("edit") as HTMLElement;
-		Data.getSingleFullTrackInfo(getUid(), this.props.id).then((data) => {
+		Data.getSingleFullTrackInfo(getUid(), this.state.id).then((data) => {
 			edit.replaceChildren(
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
@@ -62,7 +66,9 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 									id="normalRank"
 									name="normalRank"
 									aria-label="Normal Rank">
-									<option value="S">S</option>
+									<option value="S" className="s-rank-text">
+										S
+									</option>
 									<option value="A">A</option>
 									<option value="B">B</option>
 									<option value="C">C</option>
@@ -79,7 +85,9 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 									id="normalDash"
 									name="normalDash"
 									aria-label="Normal Dash Count">
-									<option value="0">What Dash? (No Dash)</option>
+									<option value="0" className="nodash">
+										What Dash? (No Dash)
+									</option>
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
@@ -95,7 +103,9 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 									id="hardcoreRank"
 									name="hardcoreRank"
 									aria-label="Hardcore Rank">
-									<option value="S">S</option>
+									<option value="S" className="s-rank-text">
+										S
+									</option>
 									<option value="A">A</option>
 									<option value="B">B</option>
 									<option value="C">C</option>
@@ -112,7 +122,9 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 									id="hardcoreDash"
 									name="hardcoreDash"
 									aria-label="Hardcore Dash Count">
-									<option value="0">What Dash? (No Dash)</option>
+									<option value="0" className="nodash">
+										What Dash? (No Dash)
+									</option>
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
@@ -131,7 +143,7 @@ export default class EditScreen extends React.Component<EditScreenProps> {
 				)
 			);
 		});
-		this.editformloop(this.props.id);
+		this.editformloop(this.state.id);
 	}
 
 	editformloop(id: number) {

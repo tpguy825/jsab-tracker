@@ -73,3 +73,29 @@ tr,
 	margin: 5px;
 }
 
+.s-rank {
+	width: 0.6rem;
+	height: 1rem;
+}
+
+.nodash {
+	color: rgb(235, 255, 235)
+}
+
+.s-rank-text {
+	background: rgb(239, 64, 118);
+	background: linear-gradient(
+		0deg,
+		rgba(239, 64, 118, 1) 0%,
+		rgba(189, 96, 140, 1) 25%,
+		rgba(106, 139, 178, 1) 56%,
+		rgba(5, 206, 230, 1) 100%
+	);
+	background-size: 100%;
+
+	-webkit-background-clip: text;
+	-moz-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-moz-text-fill-color: transparent;
+}

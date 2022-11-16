@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "bootstrap";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import { URLManager, LoginManager, setLocalStorage } from "./DataManager";
+import { LoginManager, setLocalStorage } from "./DataManager";
 
 import App from "./App";
 import Footer from "./footer/Footer";
@@ -31,10 +31,8 @@ const router = createBrowserRouter([
 		element: <LoginScreen />,
 	},
 	{
-		path: "/edit/:id",
-		loader: ({ params }) => {
-			return <EditScreen id={Number(params.id)} />;
-		},
+		path: "/edit",
+		element: <EditScreen />,
 	},
 ]);
 
