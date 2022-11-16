@@ -9,9 +9,6 @@ import {
 	linkWithPopup,
 	GithubAuthProvider,
 	GoogleAuthProvider,
-	FacebookAuthProvider,
-	signInWithEmailAndPassword,
-	createUserWithEmailAndPassword,
 } from "firebase/auth";
 import firebaseConfig from "./FirebaseConfig";
 
