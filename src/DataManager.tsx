@@ -179,7 +179,7 @@ export const Data: Data = {
 	async cloneDefaultUserTemplate(userid) {
 		await this.waitForUserAuthenticated();
 		const userdata = await get(ref(db, `users/${userid}`));
-		if (userdata.exists()) {
+		if (!userdata.exists()) {
 			const defaultUserTemplate = await get(ref(db, "defaultusertemplate"));
 			if (defaultUserTemplate.exists()) {
 				return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
