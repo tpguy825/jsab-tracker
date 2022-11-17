@@ -50,6 +50,7 @@ export const LoginManager: LoginManager = {
 			Utils.setLocalStorage("loggedin", "true");
 			Utils.setLocalStorage("email", user.email as string);
 			Utils.setLocalStorage("uid", user.uid);
+			await Data.cloneDefaultUserTemplate(user.uid);
 			URLManager.goto("/main");
 		} catch (e: any) {
 			let error = e as FirebaseError;
@@ -74,6 +75,7 @@ export const LoginManager: LoginManager = {
 					Utils.setLocalStorage("email", result.user.email as string);
 					Utils.setLocalStorage("uid", result.user.uid);
 					Utils.setLocalStorage("loggedin", "true");
+					await Data.cloneDefaultUserTemplate(result.user.uid)
 					URLManager.goto("/main");
 				} catch (error: any) {
 					errorhtml.innerText = error.message;
