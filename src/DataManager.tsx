@@ -182,7 +182,7 @@ export const Data: Data = {
 		if (!userdata.exists()) {
 			const defaultUserTemplate = await get(ref(db, "defaultusertemplate"));
 			if (defaultUserTemplate.exists()) {
-				return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
+				// return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
 			} else {
 				throw new Error("Failed to get default user template. This should never happen. If it does, try refreshing the page.");
 			}

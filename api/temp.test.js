@@ -1,25 +1,8 @@
 import * as fs from "fs";
 
-const ranks = JSON.parse(fs.readFileSync("ranks.json", "utf8"));
-const tracks = JSON.parse(fs.readFileSync("tracks.json", "utf8"));
+const ranks = JSON.parse(fs.readFileSync("api/ranks.json", "utf8"));
 
-let tracksfinal = {};
 let ranksfinal = {};
-
-for (let i = 0; i < tracks.length; i++) {
-	const trackinfo = tracks[i];
-
-	tracksfinal[i + 1] = {
-		id: trackinfo.id,
-		name: trackinfo.name,
-		artist: trackinfo.artist,
-		world: trackinfo.world,
-		checkpoints: trackinfo.checkpoints,
-		boss: trackinfo.boss,
-		notes: trackinfo.notes,
-		added: trackinfo.added,
-	};
-}
 
 for (let i = 0; i < ranks.length; i++) {
 	const trackinfo = ranks[i];
@@ -37,4 +20,4 @@ for (let i = 0; i < ranks.length; i++) {
 	};
 }
 
-fs.writeFileSync("full.json", JSON.stringify({ tracks: tracksfinal, users: { tpguy825: { ranks: ranksfinal } } }));
+fs.writeFileSync("api/ranks.json", JSON.stringify(ranksfinal));

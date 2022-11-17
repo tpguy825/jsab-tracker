@@ -55,8 +55,9 @@ export default class App extends React.Component {
 				</>
 			);
 			html.push(this.jsxtohtml(jsx, "tr"));
-			table.innerHTML = "";
 		});
+
+		table.innerHTML = "";
 
 		html.forEach((el) => {
 			table.appendChild(el);
@@ -83,7 +84,8 @@ export default class App extends React.Component {
 			await this.getTable();
 		} catch (e) {
 			console.log(e);
-			setTimeout(this.componentDidMount, 100);
+			const timeoutfunc = this.componentDidMount;
+			setTimeout(timeoutfunc, 100);
 		}
 	}
 
@@ -157,7 +159,11 @@ export default class App extends React.Component {
 							</th>
 						</tr>
 					</thead>
-					<tbody id="tablebody"><tr><td>Loading...</td></tr></tbody>
+					<tbody id="tablebody">
+						<tr>
+							<td>Loading...</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 		);
