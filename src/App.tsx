@@ -22,6 +22,7 @@ export default class App extends React.Component {
 		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
 		let html: HTMLElement[] = [];
 		let jsx = <span>Loading...</span>;
+		table.innerHTML = "";
 		data.forEach((row) => {
 			jsx = (
 				<>
@@ -54,12 +55,8 @@ export default class App extends React.Component {
 					</td>
 				</>
 			);
-			html.push(this.jsxtohtml(jsx, "tr"));
-		});
+			const el = this.jsxtohtml(jsx, "tr");
 
-		table.innerHTML = "";
-
-		html.forEach((el) => {
 			table.appendChild(el);
 
 			for (let i = 0; i < el.children.length; i++) {
