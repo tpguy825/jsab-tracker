@@ -141,14 +141,17 @@ interface Data {
 	 * // Used to wait until a user has been authenticated.
 	 * // Firebase auth is async, so this is used to wait until it's done.
 	 * // Usage:
-	 * 
+	 *
 	 * const user = await Data.waitForUserAuthenticated()
-	 * 
+	 *
 	 * // User has now been authenticated
 	 * // `user` is of type `User`
 	 * ```
 	 * */
 	waitForUserAuthenticated(): Promise<User>;
+
+	/** Check if a user's path exists */
+	checkIfUserExists(uid: string): Promise<boolean>;
 
 	/** Sets the rank data for a specific song. */
 	setUserTrackData(userid: string, data: RankInfo, id: number): Promise<void>;
@@ -175,11 +178,12 @@ interface Data {
 	cloneDefaultUserTemplate(userid: string): Promise<void>;
 }
 
-interface LoginManager {
-	login: any;
+/** `T` should be of type `User` from `firebase/auth` */
+type LoginManager<T> = {
+	user?: T;
 	loggedin(): boolean;
 	sendLoginRedirect(p: "github" | "google"): Promise<void>;
-}
+};
 
 interface URLManager {
 	/** Centralised method of redirecting */
@@ -214,11 +218,11 @@ interface Utils {
 	setLocalStorage(key: string, value: string): void;
 
 	/** Centralised way of getting values from LocalStorage
-	* ```javascript
-	* Utils.getLocalStorage("key")
-	* // is the same as
-	* localStorage.getItem("key")
-	* ``` */
+	 * ```javascript
+	 * Utils.getLocalStorage("key")
+	 * // is the same as
+	 * localStorage.getItem("key")
+	 * ``` */
 	getLocalStorage(key: string): string | null;
 }
 

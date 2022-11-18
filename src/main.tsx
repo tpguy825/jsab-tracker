@@ -1,15 +1,21 @@
+// Libraries
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+// Centralised way of managing project data
 import { LoginManager, Utils } from "./DataManager";
 
+// Components
 import App from "./App";
 import Footer from "./footer/Footer";
 import LoginScreen from "./LoginScreen";
 import EditScreen from "./EditScreen";
 import HomePage from "./HomePage";
+import Extras from "./Extras";
+
+// Styles
 import "./index.scss";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
@@ -38,6 +44,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
+		<Extras />
 		<RouterProvider router={router} />
 		<hr />
 		<Footer>If you encounter any issues, just refresh the page</Footer>

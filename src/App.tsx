@@ -20,7 +20,6 @@ export default class App extends React.Component {
 		let table = tablebody as HTMLElement;
 
 		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
-		let html: HTMLElement[] = [];
 		let jsx = <span>Loading...</span>;
 		table.innerHTML = "";
 		data.forEach((row) => {

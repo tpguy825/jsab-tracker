@@ -1,29 +1,19 @@
 import { FirebaseError, initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { get, ref, getDatabase, set } from "firebase/database";
-import {
-	getAuth,
-	signInWithPopup,
-	AuthProvider,
-	User,
-	linkWithPopup,
-	GithubAuthProvider,
-	GoogleAuthProvider,
-} from "firebase/auth";
+import { getAuth, signInWithPopup, AuthProvider, User, linkWithPopup, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import firebaseConfig from "./FirebaseConfig";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 export const db = getDatabase(app);
 const auth = getAuth(app);
 
-export const LoginManager: LoginManager = {
+export const LoginManager: LoginManager<User> = {
 	loggedin() {
 		return Utils.getLocalStorage("loggedin") === "true";
 	},
 
-	login: "any",
+	user: undefined,
 
 	async sendLoginRedirect(p) {
 		let provider;
@@ -33,14 +23,13 @@ export const LoginManager: LoginManager = {
 			provider = GoogleAuthProvider;
 		} else {
 			throw new Error("Unknown provider. This should never happen.");
-			return;
 		}
 
 		try {
 			let result = await signInWithPopup(auth, new provider() as AuthProvider);
 			// let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
-			await auth.updateCurrentUser(result.user).catch((e) => {
-				console.error(e);
+			await auth.updateCurrentUser(result.user).then(() => {
+				this.user = result.user;
 			});
 
 			// The signed-in user info.
@@ -75,7 +64,7 @@ export const LoginManager: LoginManager = {
 					Utils.setLocalStorage("email", result.user.email as string);
 					Utils.setLocalStorage("uid", result.user.uid);
 					Utils.setLocalStorage("loggedin", "true");
-					await Data.cloneDefaultUserTemplate(result.user.uid)
+					await Data.cloneDefaultUserTemplate(result.user.uid);
 					URLManager.goto("/main");
 				} catch (error: any) {
 					errorhtml.innerText = error.message;
@@ -91,14 +80,24 @@ export const LoginManager: LoginManager = {
 export const Data: Data = {
 	waitForUserAuthenticated() {
 		return new Promise((resolve, reject) => {
-			auth.onAuthStateChanged((user) => {
+			auth.onAuthStateChanged(async (user) => {
 				if (user) {
+					let exists = await this.checkIfUserExists(user.uid);
+					if (!exists) {
+						await this.cloneDefaultUserTemplate(user.uid);
+					}
 					resolve(user);
 				} else {
 					reject();
 				}
-			}, reject);
+			});
 		});
+	},
+
+	async checkIfUserExists(uid) {
+		let userRef = ref(db, `users/${uid}`);
+		let snapshot = await get(userRef);
+		return snapshot.exists();
 	},
 
 	async setUserTrackData(userid, data, id) {
@@ -112,6 +111,7 @@ export const Data: Data = {
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
+			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
@@ -122,6 +122,7 @@ export const Data: Data = {
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
+			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
@@ -133,6 +134,7 @@ export const Data: Data = {
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
+			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
@@ -144,6 +146,7 @@ export const Data: Data = {
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
+			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
@@ -177,12 +180,11 @@ export const Data: Data = {
 	},
 
 	async cloneDefaultUserTemplate(userid) {
-		await this.waitForUserAuthenticated();
 		const userdata = await get(ref(db, `users/${userid}`));
 		if (!userdata.exists()) {
 			const defaultUserTemplate = await get(ref(db, "defaultusertemplate"));
 			if (defaultUserTemplate.exists()) {
-				// return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
+				return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
 			} else {
 				throw new Error("Failed to get default user template. This should never happen. If it does, try refreshing the page.");
 			}
