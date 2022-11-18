@@ -4,7 +4,7 @@ import MainConfig from "../config/MainConfig";
 const getAnalytics = (partytown: boolean, analyticsid: string) => {
 	return (
 		<>
-			<Partytown forward={["dataLayer.push"]} />
+			{partytown ? <Partytown forward={["dataLayer.push"]} /> : undefined}
 			{/* Google tag (gtag.js) */}
 			<script type={partytown ? "text/partytown" : undefined} async src={`https://www.googletagmanager.com/gtag/js?id=${analyticsid}`}></script>
 			<script
