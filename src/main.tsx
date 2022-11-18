@@ -17,6 +17,7 @@ import Extras from "./Extras";
 
 // Styles
 import "./index.scss";
+import MainConfig from "../config/MainConfig";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
 	Utils.setLocalStorage("loggedin", "false");
@@ -47,7 +48,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<Extras />
 		<RouterProvider router={router} />
 		<hr />
-		<Footer>If you encounter any issues, just refresh the page</Footer>
+		<Footer>{MainConfig.footermessage}</Footer>
 	</React.StrictMode>
 );
 

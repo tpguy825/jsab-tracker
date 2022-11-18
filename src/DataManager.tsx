@@ -1,10 +1,10 @@
 import { FirebaseError, initializeApp } from "firebase/app";
 import { get, ref, getDatabase, set } from "firebase/database";
 import { getAuth, signInWithPopup, AuthProvider, User, linkWithPopup, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
-import firebaseConfig from "./FirebaseConfig";
+import mainConfig from "../config/MainConfig";
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(mainConfig.firebase);
 export const db = getDatabase(app);
 const auth = getAuth(app);
 
