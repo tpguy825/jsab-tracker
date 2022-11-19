@@ -1,4 +1,4 @@
-import "../src/types";
+import "./types";
 
 const Config: MainConfig = {
 	firebase: {
