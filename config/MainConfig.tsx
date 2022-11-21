@@ -1,3 +1,4 @@
+import { FirebaseOptions } from "firebase/app";
 import "./types";
 
 const Config: MainConfig = {
@@ -20,3 +21,25 @@ const Config: MainConfig = {
 };
 
 export default Config;
+
+// types
+interface MainConfig {
+	firebase: FirebaseOptions;
+	analytics: AnalyticsOptions;
+	footermessage?: string | JSX.Element;
+}
+
+type AnalyticsOptions<T = boolean> = T extends true ? {
+	/** Whether to use Google Analytics */
+	enabled: T;
+
+	/** Google Analytics tracking ID. */
+	id: string;
+
+	/** Whether to use Partytown */
+	partytown: boolean;
+} : {
+	enabled: false;
+
+	partytown: boolean;
+}
