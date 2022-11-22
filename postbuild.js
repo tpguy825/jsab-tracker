@@ -6,8 +6,8 @@ export default undefined;
 // Code that runs after the build is complete.
 
 // colours
-const lightGreen = "\x1B[92m";
-const lightRed = "\x1B[91m";
+const lightGreen = "\x1B[32m";
+const lightRed = "\x1B[31m";
 const cyan = "\x1B[36m";
 const colourReset = "\x1B[0m";
 
