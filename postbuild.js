@@ -20,6 +20,11 @@ partytowndebug.forEach((debugfile) => {
 	minify(`~partytown/debug/${debugfile}`);
 });
 
+/**
+ * @param {string} jsfilename Name of js file to minify
+ * 
+ * @return {void}
+ */
 function minify(jsfilename) {
 	const original = fs.readFileSync(`dist/${jsfilename}`, "utf8");
 	console.log("Minifying", jsfilename, "...");
@@ -49,7 +54,7 @@ function minify(jsfilename) {
 				body = body.replace(/const /g, "let ");
 				body = body.replace(/var /g, "let ");
 				console.log(
-					`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageDifference(
+					`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageChange(
 						original.length,
 						body.length
 					)}% difference). Writing to 'dist/${jsfilename}'...`
@@ -67,6 +72,40 @@ function minify(jsfilename) {
 	console.log(`Send HTTP request for ${jsfilename}...`);
 }
 
-function getPercentageDifference(from, to) {
-	return ((from - to) / from) * 100;
+/**
+ * @param {number} from
+ * @param {number} to
+ * 
+ * @return {number}
+ * 
+ * @example getPercentageChange(40, 20) // Returns 50
+ * @example getPercentageChange(40, 30) // Returns 25
+ */
+function getPercentageChange(from, to) {
+	return roundTo(((from - to) / from) * 100, 4);
+}
+
+/**
+ * @param {number} n Number to be rounded
+ * @param {number} digits To what decimal place to round to
+ * @returns {number}
+ * 
+ * @source https://stackoverflow.com/a/15762794/16402899 (edit 4)
+ */
+function roundTo(n, digits) {
+    var negative = false;
+    if (digits === undefined) {
+        digits = 0;
+    }
+    if (n < 0) {
+        negative = true;
+        n = n * -1;
+    }
+    var multiplicator = Math.pow(10, digits);
+    n = parseFloat((n * multiplicator).toFixed(11));
+    n = (Math.round(n) / multiplicator).toFixed(digits);
+    if (negative) {
+        n = (n * -1).toFixed(digits);
+    }
+    return n;
 }
