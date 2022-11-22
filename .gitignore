@@ -25,4 +25,3 @@ dist-ssr
 .dccache
 .vercel
 public/~partytown
-cloudflare-worker.js
