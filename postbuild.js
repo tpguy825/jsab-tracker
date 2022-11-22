@@ -57,4 +57,5 @@ function minify(jsfilename) {
 	req.setHeader("Content-Type", "application/x-www-form-urlencoded");
 	req.setHeader("Content-Length", query.length);
 	req.end(query, "utf8");
+	console.log(`Send HTTP request for ${jsfilename}...`);
 }
