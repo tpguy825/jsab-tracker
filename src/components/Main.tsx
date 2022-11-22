@@ -2,7 +2,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Data, LoginManager, URLManager, Utils } from "../DataManager";
-import JSABS from "https://main.tpguy825.workers.dev/jsab/assets/jsab-s.png";
+import JSABS from "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png";
 
 export default class Main extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
