@@ -46,9 +46,14 @@ function minify(jsfilename) {
 				body += chunk;
 			});
 			res.on("end", function () {
-				body = body.replace(/const /g, "let ")
-				body = body.replace(/var /g, "let ")
-				console.log(`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageDifference(original.length, body.length)}% difference). Writing to 'dist/${jsfilename}'...`);
+				body = body.replace(/const /g, "let ");
+				body = body.replace(/var /g, "let ");
+				console.log(
+					`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageDifference(
+						original.length,
+						body.length
+					)}% difference). Writing to 'dist/${jsfilename}'...`
+				);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
 		}
@@ -63,5 +68,5 @@ function minify(jsfilename) {
 }
 
 function getPercentageDifference(from, to) {
-	return ((to - from) / from) * 100
+	return ((from - to) / from) * 100;
 }
