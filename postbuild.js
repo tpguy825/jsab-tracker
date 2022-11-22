@@ -21,11 +21,11 @@ partytowndebug.forEach((debugfile) => {
 });
 
 function minify(jsfilename) {
-	const code = fs.readFileSync(`dist/${jsfilename}`, "utf8");
+	const original = fs.readFileSync(`dist/${jsfilename}`, "utf8");
 	console.log("Minifying", jsfilename, "...");
 
 	const query = querystring.stringify({
-		input: code,
+		input: original,
 	});
 
 	const req = https.request(
@@ -47,7 +47,8 @@ function minify(jsfilename) {
 			});
 			res.on("end", function () {
 				body = body.replace(/const /g, "let ")
-				console.log(`Minified ${jsfilename}! Writing ${body.length} bytes to 'dist/${jsfilename}'...`);
+				body = body.replace(/var /g, "let ")
+				console.log(`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageDifference(original.length, body.length)}% difference). Writing to 'dist/${jsfilename}'...`);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
 		}
@@ -59,4 +60,8 @@ function minify(jsfilename) {
 	req.setHeader("Content-Length", query.length);
 	req.end(query, "utf8");
 	console.log(`Send HTTP request for ${jsfilename}...`);
+}
+
+function getPercentageDifference(from, to) {
+	return ((to - from) / from) * 100
 }
