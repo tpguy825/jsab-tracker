@@ -1,4 +1,4 @@
-import { Heart, Twitter, Youtube, Github, Code, Bug } from "./Icons";
+import { Heart, Twitter, Youtube, Github, Code, Bug } from "@components/footer/Icons";
 
 /**
  * General footer for the website

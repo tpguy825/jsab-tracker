@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Data, URLManager, Utils } from "../DataManager";
+import { Data, URLManager, Utils } from "@src/DataManager";
 import $ from "jquery";
 
 export default class EditScreen extends React.Component {

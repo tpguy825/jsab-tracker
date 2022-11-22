@@ -1,5 +1,5 @@
-import JSABLogo from "./assets/jsab-icon.png";
-import { ExternalLink } from "./footer/Icons";
+import JSABLogo from "@assets/jsab-icon.png";
+import { ExternalLink } from "@components/footer/Icons";
 
 export default function HomePage() {
 	return (

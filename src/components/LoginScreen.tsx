@@ -1,5 +1,5 @@
-import { LoginManager, URLManager } from "../DataManager";
-import { Github, Google } from "./footer/Icons";
+import { LoginManager, URLManager } from "@src/DataManager";
+import { Github, Google } from "@components/footer/Icons";
 
 export default function LoginScreen() {
 	if (LoginManager.loggedin()) {
