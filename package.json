@@ -7,7 +7,8 @@
 		"dev": "vite",
 		"build": "npm run partytown && tsc && vite build && node postbuild.js",
 		"preview": "vite preview",
-		"partytown": "partytown copylib public/~partytown"
+		"partytown": "partytown copylib public/~partytown",
+		"postbuild": "purgecss --css build/static/css/*.css --content build/index.html build/static/js/*.js --output build/static/css"
 	},
 	"dependencies": {
 		"@popperjs/core": "^2.11.6",
