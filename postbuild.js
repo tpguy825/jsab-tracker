@@ -1,10 +1,15 @@
 import * as fs from "fs";
 import https from "https";
 import querystring from "querystring";
-import chalk from "chalk";
 export default undefined;
 
 // Code that runs after the build is complete.
+
+// colours
+const lightGreen = "\x1B[92m";
+const lightRed = "\x1B[91m";
+const cyan = "\x1B[36m";
+const colourReset = "\x1B[0m";
 
 // this further minifies the main js code
 const mainjs = fs.readdirSync("dist/assets").filter((filename) => filename.endsWith(".js"))[0];
@@ -28,7 +33,7 @@ partytowndebug.forEach((debugfile) => {
  */
 function minify(jsfilename) {
 	const original = fs.readFileSync(`dist/${jsfilename}`, "utf8");
-	console.log("Minifying", chalk.cyan(jsfilename), "...");
+	console.log("Minifying", cyan + jsfilename + colourReset, "...");
 
 	const query = querystring.stringify({
 		input: original,
@@ -55,9 +60,10 @@ function minify(jsfilename) {
 				body = body.replace(/const /g, "let ");
 				body = body.replace(/var /g, "let ");
 				console.log(
-					`Reduction from ${chalk.greenBright(original.length)} to ${chalk.greenBright(body.length)} (${chalk.greenBright(
-						getPercentageChange(original.length, body.length)
-					)}% difference). Writing to ${chalk.cyan("dist/${jsfilename}")}...`
+					jsfilename.startsWith("~partytown/debug") ? `[${lightRed}Debug${colourReset}]` : `[${lightGreen}Main${colourReset}]`,
+					`Reduction from ${lightGreen + original.length + colourReset} to ${lightGreen + body.length + colourReset} (${
+						lightGreen + getPercentageChange(original.length, body.length)
+					}% difference). Writing to ${cyan + `dist/${jsfilename}` + colourReset}...`
 				);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
@@ -69,7 +75,7 @@ function minify(jsfilename) {
 	req.setHeader("Content-Type", "application/x-www-form-urlencoded");
 	req.setHeader("Content-Length", query.length);
 	req.end(query, "utf8");
-	console.log(`Send HTTP request for ${chalk.cyan(jsfilename)}...`);
+	console.log(`Send HTTP request for ${cyan + jsfilename + colourReset}...`);
 }
 
 /**
