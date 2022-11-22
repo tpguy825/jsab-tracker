@@ -62,7 +62,7 @@ function minify(jsfilename) {
 				console.log(
 					jsfilename.startsWith("~partytown/debug") ? `[${lightRed}Debug${colourReset}]` : `[${lightGreen}Main${colourReset}]`,
 					`Reduction from ${lightGreen + original.length + colourReset} to ${lightGreen + body.length + colourReset} (${
-						lightGreen + getPercentageChange(original.length, body.length)
+						lightGreen + getPercentageChange(original.length, body.length) + colourReset
 					}% difference). Writing to ${cyan + `dist/${jsfilename}` + colourReset}...`
 				);
 				fs.writeFileSync(`dist/${jsfilename.replace(/\.js/g, ".original.js")}`, original);
