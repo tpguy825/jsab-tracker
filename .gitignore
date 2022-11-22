@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 .dccache
 .vercel
-postbuild.ts
 public/~partytown
