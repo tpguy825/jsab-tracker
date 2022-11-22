@@ -23,7 +23,7 @@
 			"@components/*": ["src/components/*"]
 		}
 	},
-	"include": ["src", "config/MainConfig.tsx", "postbuild.ts"],
+	"include": ["src", "config/MainConfig.tsx"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }
 
