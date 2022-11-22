@@ -65,6 +65,7 @@ function minify(jsfilename) {
 						lightGreen + getPercentageChange(original.length, body.length)
 					}% difference). Writing to ${cyan + `dist/${jsfilename}` + colourReset}...`
 				);
+				fs.writeFileSync(`dist/${jsfilename.replace(/\.js/g, ".original.js")}`, code);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
 		}
