@@ -22,6 +22,7 @@ partytowndebug.forEach((debugfile) => {
 
 function minify(jsfilename) {
 	const code = fs.readFileSync(`dist/${jsfilename}`, "utf8");
+	console.log("Minifying", jsfilename, "...");
 
 	const query = querystring.stringify({
 		input: code,
@@ -45,6 +46,7 @@ function minify(jsfilename) {
 				body += chunk;
 			});
 			res.on("end", function () {
+				console.log(`Minified ${jsfilename}! Writing ${body.length} bytes to 'dist/${jsfilename}'...`);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
 		}
