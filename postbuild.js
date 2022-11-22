@@ -46,6 +46,7 @@ function minify(jsfilename) {
 				body += chunk;
 			});
 			res.on("end", function () {
+				body = body.replace(/const /g, "let ")
 				console.log(`Minified ${jsfilename}! Writing ${body.length} bytes to 'dist/${jsfilename}'...`);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
