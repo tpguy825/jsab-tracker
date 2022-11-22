@@ -5,6 +5,8 @@ export default undefined;
 
 // Code that runs after the build is complete.
 
+
+// this further minifies the main js code
 const jsfilename = fs.readdirSync("dist/assets").filter((filename) => filename.endsWith(".js"))[0];
 const code = fs.readFileSync(`dist/assets/${jsfilename}`, "utf8");
 
