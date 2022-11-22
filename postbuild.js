@@ -10,14 +10,14 @@ const mainjs = fs.readdirSync("dist/assets").filter((filename) => filename.endsW
 const partytown = fs.readdirSync("dist/~partytown").filter((filename) => filename.endsWith(".js"));
 const partytowndebug = fs.readdirSync("dist/~partytown/debug").filter((filename) => filename.endsWith(".js"));
 
-minify(mainjs);
+minify(`assets/${mainjs}`);
 
 partytown.forEach((file) => {
-	minify(file);
+	minify(`~partytown/${file}`);
 });
 
 partytowndebug.forEach((debugfile) => {
-	minify(debugfile);
+	minify(`~partytown/debug/${debugfile}`);
 });
 
 function minify(jsfilename) {
