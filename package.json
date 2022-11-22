@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "npm run partytown && tsc && vite build",
+		"build": "npm run partytown && tsc && vite build && ls",
 		"preview": "vite preview",
 		"partytown": "partytown copylib public/~partytown"
 	},
