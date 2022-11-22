@@ -1,5 +1,0 @@
-export APIHOST="jsab.tpguy825.cf"
-export APIPORT="443"
-export VITEHOST="jsab.tpguy825.cf"
-export VITEPORT="443"
-vite --host $@

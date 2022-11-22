@@ -1,4 +1,4 @@
-import { LoginManager, URLManager } from "./DataManager";
+import { LoginManager, URLManager } from "../DataManager";
 import { Github, Google } from "./footer/Icons";
 
 export default function LoginScreen() {

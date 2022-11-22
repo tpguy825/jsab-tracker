@@ -5,19 +5,19 @@ import "bootstrap";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Centralised way of managing project data
-import { LoginManager, Utils } from "./DataManager";
+import { LoginManager, Utils } from "@src/DataManager";
 
 // Components
-import App from "./App";
-import Footer from "./footer/Footer";
-import LoginScreen from "./LoginScreen";
-import EditScreen from "./EditScreen";
-import HomePage from "./HomePage";
-import Extras from "./Extras";
+import Main from "@components/Main";
+import Footer from "@components/footer/Footer";
+import LoginScreen from "@components/LoginScreen";
+import EditScreen from "@components/EditScreen";
+import HomePage from "@components/HomePage";
+import Extras from "@components/Extras";
 
 // Styles
-import "./index.scss";
-import MainConfig from "../config/MainConfig";
+import "@assets/index.scss";
+import MainConfig from "@config/MainConfig";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
 	Utils.setLocalStorage("loggedin", "false");
@@ -31,7 +31,7 @@ const router = createBrowserRouter([
 	},
 	{
 		path: "/main",
-		element: <App />,
+		element: <Main />,
 	},
 	{
 		path: "/login",

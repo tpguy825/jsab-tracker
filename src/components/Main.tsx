@@ -1,10 +1,10 @@
 // file deepcode ignore ReactEventHandlerThis, file deepcode ignore ReactMissingCleanup
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Data, LoginManager, URLManager, Utils } from "./DataManager";
-import JSABS from "./assets/jsab-s.png";
+import { Data, LoginManager, URLManager, Utils } from "../DataManager";
+import JSABS from "@assets/jsab-s.png";
 
-export default class App extends React.Component {
+export default class Main extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
 	hostname: string;
 

@@ -1,7 +1,6 @@
 import { FirebaseOptions } from "firebase/app";
-import "./types";
 
-const Config: MainConfig = {
+export const config: MainConfig = {
 	firebase: {
 		apiKey: "AIzaSyCYPrNNy-UFuNsC5VFd2pEiedJU2IOEf3c",
 		authDomain: "jsab-tracker.firebaseapp.com",
@@ -19,8 +18,7 @@ const Config: MainConfig = {
 	},
 	footermessage: "If you encounter any issues, try refreshing the page.",
 };
-
-export default Config;
+export default config;
 
 // types
 interface MainConfig {
@@ -29,17 +27,16 @@ interface MainConfig {
 	footermessage?: string | JSX.Element;
 }
 
-type AnalyticsOptions<T = boolean> = T extends true ? {
-	/** Whether to use Google Analytics */
-	enabled: T;
-
-	/** Google Analytics tracking ID. */
-	id: string;
-
-	/** Whether to use Partytown */
-	partytown: boolean;
-} : {
-	enabled: false;
-
-	partytown: boolean;
-}
+type AnalyticsOptions = {
+			/** Whether to use Google Analytics */
+			enabled: true;
+			
+			/** Google Analytics tracking ID. */
+			id: string;
+			
+			/** Whether to use Partytown */
+			partytown: boolean;
+		} | {
+			/** Whether to use Google Analytics */
+			enabled: false;
+	  };

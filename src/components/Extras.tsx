@@ -1,5 +1,5 @@
 import { Partytown } from "@builder.io/partytown/react";
-import MainConfig from "../config/MainConfig";
+import MainConfig from "@config/MainConfig";
 
 const getAnalytics = (partytown: boolean, analyticsid: string) => {
 	return (
@@ -25,5 +25,6 @@ const getAnalytics = (partytown: boolean, analyticsid: string) => {
  * Extra things to be placed in the document
  */
 export default function Extras() {
-	return <>{MainConfig.analytics.enabled ? getAnalytics(MainConfig.analytics.partytown, MainConfig.analytics.id as string) : undefined}</>;
+	const { analytics } = MainConfig;
+	return <>{analytics.enabled ? getAnalytics(analytics.partytown, analytics.id) : undefined}</>;
 }
