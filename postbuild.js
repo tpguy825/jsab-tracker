@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import https from "https";
 import querystring from "querystring";
+import chalk from "chalk";
 export default undefined;
 
 // Code that runs after the build is complete.
@@ -22,12 +23,12 @@ partytowndebug.forEach((debugfile) => {
 
 /**
  * @param {string} jsfilename Name of js file to minify
- * 
+ *
  * @return {void}
  */
 function minify(jsfilename) {
 	const original = fs.readFileSync(`dist/${jsfilename}`, "utf8");
-	console.log("Minifying", jsfilename, "...");
+	console.log("Minifying", chalk.cyan(jsfilename), "...");
 
 	const query = querystring.stringify({
 		input: original,
@@ -54,10 +55,9 @@ function minify(jsfilename) {
 				body = body.replace(/const /g, "let ");
 				body = body.replace(/var /g, "let ");
 				console.log(
-					`Minified ${jsfilename}! Reduction from ${original.length} to ${body.length} (${getPercentageChange(
-						original.length,
-						body.length
-					)}% difference). Writing to 'dist/${jsfilename}'...`
+					`Reduction from ${chalk.greenBright(original.length)} to ${chalk.greenBright(body.length)} (${chalk.greenBright(
+						getPercentageChange(original.length, body.length)
+					)}% difference). Writing to ${chalk.cyan("dist/${jsfilename}")}...`
 				);
 				fs.writeFileSync(`dist/${jsfilename}`, body);
 			});
@@ -69,43 +69,44 @@ function minify(jsfilename) {
 	req.setHeader("Content-Type", "application/x-www-form-urlencoded");
 	req.setHeader("Content-Length", query.length);
 	req.end(query, "utf8");
-	console.log(`Send HTTP request for ${jsfilename}...`);
+	console.log(`Send HTTP request for ${chalk.cyan(jsfilename)}...`);
 }
 
 /**
- * @param {number} from
- * @param {number} to
- * 
- * @return {number}
- * 
+ * @param {number} from Original number
+ * @param {number} to Changed number
+ * @param {number} roundeddigits How many digits to round to (default 4)
+ *
+ * @return {number} number (percentage)
+ *
  * @example getPercentageChange(40, 20) // Returns 50
- * @example getPercentageChange(40, 30) // Returns 25
+ * getPercentageChange(40, 30) // Returns 25
  */
-function getPercentageChange(from, to) {
-	return roundTo(((from - to) / from) * 100, 4);
+function getPercentageChange(from, to, roundeddigits = 4) {
+	return roundTo(((from - to) / from) * 100, roundeddigits);
 }
 
 /**
  * @param {number} n Number to be rounded
  * @param {number} digits To what decimal place to round to
- * @returns {number}
- * 
+ * @returns {number} number
+ *
  * @source https://stackoverflow.com/a/15762794/16402899 (edit 4)
  */
 function roundTo(n, digits) {
-    var negative = false;
-    if (digits === undefined) {
-        digits = 0;
-    }
-    if (n < 0) {
-        negative = true;
-        n = n * -1;
-    }
-    var multiplicator = Math.pow(10, digits);
-    n = parseFloat((n * multiplicator).toFixed(11));
-    n = (Math.round(n) / multiplicator).toFixed(digits);
-    if (negative) {
-        n = (n * -1).toFixed(digits);
-    }
-    return n;
+	var negative = false;
+	if (digits === undefined) {
+		digits = 0;
+	}
+	if (n < 0) {
+		negative = true;
+		n = n * -1;
+	}
+	var multiplicator = Math.pow(10, digits);
+	n = parseFloat((n * multiplicator).toFixed(11));
+	n = (Math.round(n) / multiplicator).toFixed(digits);
+	if (negative) {
+		n = (n * -1).toFixed(digits);
+	}
+	return n;
 }
