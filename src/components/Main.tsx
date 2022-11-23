@@ -22,7 +22,9 @@ export default class Main extends React.Component {
 		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
 		let jsx = <span>Loading...</span>;
 		table.innerHTML = "";
-		data.forEach((row) => {
+		for (let i = 1; i < 53; i++) {
+			const row = await Data.getSingleFullTrackInfo(Utils.getUid() as string, i)
+			
 			jsx = (
 				<>
 					<th scope="row">{row.id}</th>
@@ -68,7 +70,7 @@ export default class Main extends React.Component {
 					});
 				}
 			}
-		}, this);
+		};
 	}
 
 	gotoedit(id: string) {
