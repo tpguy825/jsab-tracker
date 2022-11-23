@@ -6,15 +6,15 @@ export default undefined;
 // Code that runs after the build is complete.
 
 // colours
-const lightGreen = "\x1B[32m";
-const lightRed = "\x1B[31m";
+const green = "\x1B[32m";
+const red = "\x1B[31m";
 const cyan = "\x1B[36m";
 const colourReset = "\x1B[0m";
 
 // this further minifies the main js code
-const mainjs = fs.readdirSync("dist/assets").filter((filename) => filename.endsWith(".js"))[0];
-const partytown = fs.readdirSync("dist/~partytown").filter((filename) => filename.endsWith(".js"));
-const partytowndebug = fs.readdirSync("dist/~partytown/debug").filter((filename) => filename.endsWith(".js"));
+const mainjs = fs.readdirSync("dist/assets").filter((f) => f.endsWith(".js"))[0];
+const partytown = fs.readdirSync("dist/~partytown").filter((f) => f.endsWith(".js"));
+const partytowndebug = fs.readdirSync("dist/~partytown/debug").filter((f) => f.endsWith(".js"));
 
 partytown.forEach((file) => {
 	minify(`~partytown/${file}`);
@@ -58,9 +58,9 @@ function minify(jsfilename) {
 				body = body.replace(/const /g, "let ");
 				body = body.replace(/var /g, "let ");
 				console.log(
-					jsfilename.startsWith("~partytown/debug") ? `[${lightRed}Debug${colourReset}]` : `[${lightGreen}Main${colourReset}]`,
-					`Reduction from ${lightGreen + original.length + colourReset} to ${lightGreen + body.length + colourReset} (${
-						lightGreen + getPercentageChange(original.length, body.length) + "%" + colourReset
+					jsfilename.startsWith("~partytown/debug") ? `[${red}Debug${colourReset}]` : `[${green}Main${colourReset}]`,
+					`Reduction from ${green + original.length + colourReset} to ${green + body.length + colourReset} (${
+						green + getPercentageChange(original.length, body.length) + "%" + colourReset
 					} difference). Writing to ${cyan + `dist/${jsfilename}` + colourReset}...`
 				);
 				fs.writeFileSync(`dist/${jsfilename.replace(/\.js/g, ".original.js")}`, original);

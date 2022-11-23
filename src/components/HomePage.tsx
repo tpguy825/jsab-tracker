@@ -1,4 +1,4 @@
-import JSABLogo from "https://cdn.tpguy825.cf/jsab/assets/jsab-icon.png";
+const JSABLogo = "https://cdn.tpguy825.cf/jsab/assets/jsab-icon.png";
 import { ExternalLink } from "@components/footer/Icons";
 
 export default function HomePage() {
