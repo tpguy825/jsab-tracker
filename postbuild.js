@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 import https from "https";
 import querystring from "querystring";
@@ -72,6 +73,7 @@ function minify(jsfilename) {
 		throw e;
 	});
 	req.setHeader("Content-Type", "application/x-www-form-urlencoded");
+	// deepcode ignore ContentLengthInCode: it's not sent by the browser
 	req.setHeader("Content-Length", query.length);
 	req.end(query, "utf8");
 	console.log(`Send HTTP request for ${cyan + jsfilename + colourReset}...`);

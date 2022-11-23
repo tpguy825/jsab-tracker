@@ -42,7 +42,7 @@ export default class EditScreen extends React.Component {
 		return output;
 	}
 
-	form() {
+	form(): void {
 		const edit = document.getElementById("edit") as HTMLElement;
 		Data.getSingleFullTrackInfo(Utils.getUid() as string, this.state.id).then((data) => {
 			edit.replaceChildren(

@@ -51,4 +51,3 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<Footer>{MainConfig.footermessage}</Footer>
 	</React.StrictMode>
 );
-
