@@ -2,19 +2,19 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Data, URLManager, Utils } from "@src/DataManager";
 import $ from "jquery";
+import { log } from "console";
 
-export default class EditScreen extends React.Component {
-	state: { id: number };
+export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 	rankelement?: HTMLSelectElement;
 	dashelement?: HTMLSelectElement;
 
 	constructor(props: any) {
 		super(props);
 
-		this.state = { id: this.getEditID() };
-
-		if (this.state.id < 1 || this.state.id > 54) {
+		if (!Data.isValidID(this.getEditID())) {
 			this.gotomain();
+		} else {
+			this.state = { id: this.getEditID() as IDRange };
 		}
 	}
 
@@ -44,7 +44,11 @@ export default class EditScreen extends React.Component {
 
 	form(): void {
 		const edit = document.getElementById("edit") as HTMLElement;
+		// fixit - this.state.id is 1 too high but dislikes having -1 done to it.
+		// fixit - this throws an error (TypeError: cannot read property `id` of undefined)
+		// fixit - this is quite urgent
 		Data.getSingleFullTrackInfo(Utils.getUid() as string, this.state.id).then((data) => {
+			console.log(data);
 			edit.replaceChildren(
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
@@ -146,7 +150,7 @@ export default class EditScreen extends React.Component {
 		this.editformloop(this.state.id);
 	}
 
-	editformloop(id: number) {
+	editformloop(id: IDRange) {
 		if ($("#edit-form")[0] !== undefined) {
 			$("#edit-form")
 				.get()
@@ -160,15 +164,15 @@ export default class EditScreen extends React.Component {
 							const hardcoreRank = document.getElementById("hardcoreRank") as HTMLSelectElement;
 							const hardcoreDash = document.getElementById("hardcoreDash") as HTMLSelectElement;
 
-							const data = {
+							const data: RankInfo = {
 								id: id,
 								normal: {
-									rank: normalRank.value,
-									dash: Number(normalDash.value),
+									rank: normalRank.value as Rank,
+									dash: Number(normalDash.value) as DashCount,
 								},
 								hardcore: {
-									rank: hardcoreRank.value,
-									dash: Number(hardcoreDash.value),
+									rank: hardcoreRank.value as Rank,
+									dash: Number(hardcoreDash.value) as DashCount,
 								},
 							};
 

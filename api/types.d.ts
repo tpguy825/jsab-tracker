@@ -52,5 +52,5 @@ class Data {
 
 	add(id: number, normal: { rank: string, dash: number }, dash: { rank: string, dash: number }): void
 
-	async save(): Promise<void>
+	save(): Promise<void>
 }

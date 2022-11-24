@@ -77,21 +77,38 @@ export const LoginManager: LoginManager<User> = {
 	},
 };
 
-export const Data: Data = {
+export const Data: DataTypes = {
 	waitForUserAuthenticated() {
 		return new Promise((resolve, reject) => {
 			auth.onAuthStateChanged(async (user) => {
 				if (user) {
-					let exists = await this.checkIfUserExists(user.uid);
+					let exists = await Data.checkIfUserExists(user.uid);
 					if (!exists) {
-						await this.cloneDefaultUserTemplate(user.uid);
+						await Data.cloneDefaultUserTemplate(user.uid);
 					}
 					resolve(user);
 				} else {
-					reject();
+					if (user === null) {
+						Utils.setLocalStorage("email", "");
+						Utils.setLocalStorage("uid", "");
+						Utils.setLocalStorage("loggedin", "false");
+						URLManager.goto("/login");
+					} else {
+						reject(user);
+					}
 				}
 			});
 		});
+	},
+
+	isValidID(id) {
+		return id > 0 && id < 54;
+	},
+
+	keyArrayForEach(keyarray, callbackfn) {
+		for (const key in keyarray) {
+			callbackfn(keyarray[key], key);
+		}
 	},
 
 	async checkIfUserExists(uid) {
@@ -108,6 +125,7 @@ export const Data: Data = {
 	async getUserTrackData(userid) {
 		await this.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks`));
+
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
@@ -156,21 +174,21 @@ export const Data: Data = {
 		const trackinfo = await this.getAllTracksInfo();
 		const userdataforid = await this.getUserTrackData(userid);
 
-		let full: DataInfo[] = [];
+		let full: KeyArray<IDRange, DataInfo> = {} as any;
 
-		trackinfo.forEach((track, i) => {
-			full.push({
+		this.keyArrayForEach(trackinfo, (track, i) => {
+			full[track.id] = {
 				...track,
-				...userdataforid[i + 1],
-			});
+				...userdataforid[String(track.id)],
+			};
 		});
 
 		return full;
 	},
 
-	async getSingleFullTrackInfo(userid: string, trackid: number) {
+	async getSingleFullTrackInfo(userid: string, trackid: IDRange) {
 		await this.waitForUserAuthenticated();
-		const trackinfo = await this.getTrackInfo(trackid - 1);
+		const trackinfo = await this.getTrackInfo(trackid);
 		const userdataforid = await this.getUserTrackInfo(userid, trackid);
 
 		return {
@@ -223,10 +241,16 @@ export const Utils: Utils = {
 	},
 
 	logout() {
-		Utils.setLocalStorage("email", "");
-		Utils.setLocalStorage("uid", "");
-		Utils.setLocalStorage("loggedin", "false");
-		URLManager.reload();
+		if (LoginManager.user !== undefined) {
+			Utils.setLocalStorage("email", "");
+			Utils.setLocalStorage("uid", "");
+			Utils.setLocalStorage("loggedin", "false");
+			auth.signOut();
+			URLManager.reload();
+		} else {
+			throw new Error("User is not logged in");
+			URLManager.goto("/login");
+		}
 	},
 
 	setLocalStorage(key: string, value: string) {

@@ -2,7 +2,7 @@
 
 interface DataInfo {
 	/** How far down the level is on the playlist screen */
-	id: number;
+	id: IDRange;
 
 	/** Track name */
 	name: string;
@@ -28,25 +28,31 @@ interface DataInfo {
 	/** Rank and dash amount for normal mode */
 	normal: {
 		/** Rank (S, A, B, C, blank if unknown) */
-		rank: string;
+		rank: Rank;
 
 		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
-		dash: number;
+		dash: DashCount;
 	};
 
 	/** Rank and dash amount for hardcore mode */
 	hardcore: {
 		/** Rank (S, A, B, C, blank if unknown) */
-		rank: string;
+		rank: Rank;
 
 		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
-		dash: number;
+		dash: DashCount;
 	};
 }
 
+type KeyArray<Index, Data> = {
+	[Key in Index]: Data;
+};
+
+type IDRange = IntRange<1, 54>;
+
 interface TrackInfo {
 	/** How far down the level is on the playlist screen */
-	id: number;
+	id: IDRange;
 
 	/** Track name */
 	name: string;
@@ -72,42 +78,32 @@ interface TrackInfo {
 
 interface RankInfo {
 	/** How far down the level is on the playlist screen */
-	id: number;
+	id: IDRange;
 
 	/** Rank and dash amount for normal mode */
 	normal: {
 		/** Rank (S, A, B, C, blank if unknown) */
-		rank: string;
+		rank: Rank;
 
 		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
-		dash: number;
+		dash: DashCount;
 	};
 
 	/** Rank and dash amount for hardcore mode */
 	hardcore: {
 		/** Rank (S, A, B, C, blank if unknown) */
-		rank: string;
+		rank: Rank;
 
 		/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
-		dash: number;
+		dash: DashCount;
 	};
 }
 
-interface GetDataCallback<T> {
-	/** Was there an error? */
-	error: boolean;
+/** Dash (0 - No dash, 1 - Slow Poke, 2 - >10 dashes, 3 - Unknown) */
+type DashCount = IntRange<0, 4>;
 
-	/** Error message */
-	message?: Error;
-
-	/** Response from db */
-	data?: T;
-}
-
-type GetRankDataCallback = RankInfo;
-type GetTrackDataCallback = TrackInfo;
-type GetAllTracksDataCallback = TrackInfo[];
-type GetFullTracksDataCallback = DataInfo[];
+/** Rank (S, A, B, C, blank if unknown) */
+type Rank = "S" | "A" | "B" | "C" | "";
 
 interface AppState {
 	/** Array of levels and their info */
@@ -117,27 +113,11 @@ interface AppState {
 	tablejsx: JSX.Element[];
 }
 
-interface Config {
-	apihost: string;
-	apiport: number;
-	apifull: string;
-	vitehost: string;
-	viteport: number;
-	vitefull: string;
-}
-
-interface PartialConfig {
-	apihost: string;
-	apiport: number;
-	vitehost: string;
-	viteport: number;
-}
-
 /**
  * **Warning**: not all function names make sense. Use the JSDoc comments to help.
  */
-interface Data {
-	/** ```javascript
+interface DataTypes {
+	/** @example
 	 * // Used to wait until a user has been authenticated.
 	 * // Firebase auth is async, so this is used to wait until it's done.
 	 * // Usage:
@@ -146,33 +126,38 @@ interface Data {
 	 *
 	 * // User has now been authenticated
 	 * // `user` is of type `User`
-	 * ```
-	 * */
+	 */
 	waitForUserAuthenticated(): Promise<User>;
+
+	/** Checks if a track ID is valid */
+	isValidID(id: number): boolean;
+
+	/** Loops over a `KeyArray` */
+	keyArrayForEach<I, V>(keyarray: KeyArray<I, V>, callbackfn: (value: V, index: I) => void): void;
 
 	/** Check if a user's path exists */
 	checkIfUserExists(uid: string): Promise<boolean>;
 
 	/** Sets the rank data for a specific song. */
-	setUserTrackData(userid: string, data: RankInfo, id: number): Promise<void>;
+	setUserTrackData(userid: string, data: RankInfo, id: IDRange): Promise<void>;
 
 	/** Gets full user tracks data. */
-	getUserTrackData(userid: string): Promise<RankInfo[]>;
+	getUserTrackData(userid: string): Promise<KeyArray<string, RankInfo>>;
 
 	/** Gets the info of a track for a user */
 	getUserTrackInfo(userid: string, trackid: number): Promise<RankInfo>;
 
 	/** Gets the info about a track */
-	getTrackInfo(id: number): Promise<TrackInfo>;
+	getTrackInfo(id: IDRange): Promise<TrackInfo>;
 
 	/** Gets all tracks */
-	getAllTracksInfo(): Promise<TrackInfo[]>;
+	getAllTracksInfo(): Promise<KeyArray<string, TrackInfo>>;
 
 	/** Gets the full info (track data and rank data) from all tracks for a user */
-	getFullTracksInfo(userid: string): Promise<DataInfo[]>;
+	getFullTracksInfo(userid: string): Promise<KeyArray<IDRange, DataInfo>>;
 
 	/** Gets the full info (track data and rank data) from a single track */
-	getSingleFullTrackInfo(userid: string, trackid: number): Promise<DataInfo>;
+	getSingleFullTrackInfo(userid: string, trackid: IDRange): Promise<DataInfo>;
 
 	/** Clones the default user template for a new user */
 	cloneDefaultUserTemplate(userid: string): Promise<void>;
@@ -225,3 +210,22 @@ interface Utils {
 	 * ``` */
 	getLocalStorage(key: string): string | null;
 }
+
+type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc["length"]]>;
+
+/**
+ * ```javascript
+// Type version of
+if (x <= n < y) {}
+// where 
+const num: IntRange<x, y> = n
+
+// Examples:
+const num: IntRange<1, 10> = 5  // ✅ works
+const num: IntRange<1, 10> = 1  // ✅ works
+const num: IntRange<1, 10> = 11 // ❌ error
+const num: IntRange<1, 10> = 10 // ❌ error
+```
+ */
+type IntRange<X extends number, Y extends number> = Exclude<Enumerate<Y>, Enumerate<X>>;
+

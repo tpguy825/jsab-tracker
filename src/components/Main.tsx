@@ -2,7 +2,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Data, LoginManager, URLManager, Utils } from "../DataManager";
-const JSABS = "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png"
+const JSABS = "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png";
 
 export default class Main extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
@@ -20,9 +20,10 @@ export default class Main extends React.Component {
 		let table = tablebody as HTMLElement;
 
 		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
+
 		let jsx = <span>Loading...</span>;
 		table.innerHTML = "";
-		data.forEach((row) => {
+		Data.keyArrayForEach(data, (row) => {
 			jsx = (
 				<>
 					<th scope="row">{row.id}</th>
@@ -64,14 +65,14 @@ export default class Main extends React.Component {
 				if (buttonmaybe.children[0] !== undefined && buttonmaybe.children[0].nodeName === "BUTTON") {
 					const button = buttonmaybe.children[0] as HTMLButtonElement;
 					button.addEventListener("click", (ev) => {
-						this.gotoedit((ev.target as HTMLElement).dataset.id as string);
+						this.gotoedit(Number((ev.target as HTMLElement).dataset.id) as IDRange);
 					});
 				}
 			}
-		}, this);
+		});
 	}
 
-	gotoedit(id: string) {
+	gotoedit(id: IDRange) {
 		URLManager.goto(`/edit?id=${id}`);
 	}
 
@@ -80,12 +81,20 @@ export default class Main extends React.Component {
 			await this.getTable();
 		} catch (e) {
 			console.log(e);
-			const timeoutfunc = this.componentDidMount;
-			setTimeout(timeoutfunc, 100);
+			const timeoutfunc = async (getTable: () => Promise<void>, nextfunc: any) => {
+				try {
+					await getTable();
+				} catch (e) {
+					console.log(e);
+					const timeoutfunc = (nextfunc: any) => {};
+					setTimeout(() => nextfunc(getTable, nextfunc), 100);
+				}
+			};
+			setTimeout(() => timeoutfunc(this.getTable, timeoutfunc), 100);
 		}
 	}
 
-	parsedash(dash: number) {
+	parsedash(dash: DashCount) {
 		switch (dash) {
 			case 0:
 				return <td className="nodash">No Dash</td>;
@@ -104,7 +113,7 @@ export default class Main extends React.Component {
 		}
 	}
 
-	jsxtohtml(jsx: JSX.Element, type: string = "div") {
+	jsxtohtml(jsx: JSX.Element, type = "div") {
 		const output = document.createElement(type);
 		const staticElement = renderToStaticMarkup(jsx);
 		output.innerHTML = staticElement;
