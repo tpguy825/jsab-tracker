@@ -179,7 +179,7 @@ export const Data: DataTypes = {
 		this.keyArrayForEach(trackinfo, (track, i) => {
 			full[track.id] = {
 				...track,
-				...userdataforid[String(track.id)],
+				...userdataforid[String(track.id-1)],
 			};
 		});
 
