@@ -12,18 +12,22 @@ const red = "\x1B[31m";
 const cyan = "\x1B[36m";
 const colourReset = "\x1B[0m";
 
-// this further minifies the main js code
-const mainjs = fs.readdirSync("dist/assets").filter((f) => f.endsWith(".js"))[0];
-const partytown = fs.readdirSync("dist/~partytown").filter((f) => f.endsWith(".js"));
-const partytowndebug = fs.readdirSync("dist/~partytown/debug").filter((f) => f.endsWith(".js"));
+// minifyfiles();
 
-partytown.forEach((file) => {
-	minify(`~partytown/${file}`);
-});
+function minifyfiles() {
+	// this further minifies the main js code
+	const mainjs = fs.readdirSync("dist/assets").filter((f) => f.endsWith(".js"))[0];
+	const partytown = fs.readdirSync("dist/~partytown").filter((f) => f.endsWith(".js"));
+	const partytowndebug = fs.readdirSync("dist/~partytown/debug").filter((f) => f.endsWith(".js"));
 
-partytowndebug.forEach((debugfile) => {
-	minify(`~partytown/debug/${debugfile}`);
-});
+	partytown.forEach((file) => {
+		minify(`~partytown/${file}`);
+	});
+
+	partytowndebug.forEach((debugfile) => {
+		minify(`~partytown/debug/${debugfile}`);
+	});
+}
 
 /**
  * @param {string} jsfilename Name of js file to minify

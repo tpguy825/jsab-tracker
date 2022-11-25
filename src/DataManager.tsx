@@ -8,14 +8,14 @@ const app = initializeApp(mainConfig.firebase);
 export const db = getDatabase(app);
 const auth = getAuth(app);
 
-export const LoginManager: LoginManager<User> = {
-	loggedin() {
+export const LoginManager = {
+	loggedin(): boolean {
 		return Utils.getLocalStorage("loggedin") === "true";
 	},
 
-	user: undefined,
+	user: undefined as User | undefined,
 
-	async sendLoginRedirect(p) {
+	async sendLoginRedirect(p: "github" | "google"): Promise<void> {
 		let provider;
 		if (p === "github") {
 			provider = GithubAuthProvider;
@@ -29,7 +29,7 @@ export const LoginManager: LoginManager<User> = {
 			let result = await signInWithPopup(auth, new provider() as AuthProvider);
 			// let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
 			await auth.updateCurrentUser(result.user).then(() => {
-				this.user = result.user;
+				LoginManager.user = result.user;
 			});
 
 			// The signed-in user info.
@@ -77,8 +77,21 @@ export const LoginManager: LoginManager<User> = {
 	},
 };
 
-export const Data: DataTypes = {
-	waitForUserAuthenticated() {
+/**
+ * **Warning**: not all function names make sense. Use the JSDoc comments to help.
+ */
+export const Data = {
+	/** @example
+	 * // Used to wait until a user has been authenticated.
+	 * // Firebase auth is async, so this is used to wait until it's done.
+	 * // Usage:
+	 *
+	 * const user = await Data.waitForUserAuthenticated()
+	 *
+	 * // User has now been authenticated
+	 * // `user` is of type `User`
+	 */
+	waitForUserAuthenticated(): Promise<User> {
 		return new Promise((resolve, reject) => {
 			auth.onAuthStateChanged(async (user) => {
 				if (user) {
@@ -101,95 +114,109 @@ export const Data: DataTypes = {
 		});
 	},
 
-	isValidID(id) {
+	/** Checks if a track ID is valid */
+	isValidID(id: number): boolean {
 		return id > 0 && id < 54;
 	},
 
-	keyArrayForEach(keyarray, callbackfn) {
+	isValidDash(id: number): boolean {
+		return id > 0 && id < 4;
+	},
+
+	/** Loops over a `KeyArray` */
+	keyArrayForEach<I, V>(keyarray: KeyArray<I, V>, callbackfn: (value: V, index: I) => void): void {
 		for (const key in keyarray) {
 			callbackfn(keyarray[key], key);
 		}
 	},
 
-	async checkIfUserExists(uid) {
+	/** Check if a user's path exists */
+	async checkIfUserExists(uid: string): Promise<boolean> {
 		let userRef = ref(db, `users/${uid}`);
 		let snapshot = await get(userRef);
 		return snapshot.exists();
 	},
 
-	async setUserTrackData(userid, data, id) {
-		await this.waitForUserAuthenticated();
+	/** Sets the rank data for a specific song. */
+	async setUserTrackData(userid: string, data: RankInfo, id: IDRange): Promise<void> {
+		await Data.waitForUserAuthenticated();
 		return set(ref(db, `users/${userid}/ranks/${id}`), data);
 	},
 
-	async getUserTrackData(userid) {
-		await this.waitForUserAuthenticated();
+	/** Gets full user tracks data. */
+	async getUserTrackData(userid: string): Promise<KeyArray<string, RankInfo>> {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks`));
 
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
-			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
+			Data.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
 
-	async getUserTrackInfo(userid, trackid) {
-		await this.waitForUserAuthenticated();
+	/** Gets the info of a track for a user */
+	async getUserTrackInfo(userid: string, trackid: number): Promise<RankInfo> {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks/${trackid}`));
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
-			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
+			Data.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
 
-	async getTrackInfo(id) {
-		await this.waitForUserAuthenticated();
+	/** Gets the info about a track */
+	async getTrackInfo(id: IDRange): Promise<TrackInfo> {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `tracks/${id}`));
 
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
-			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
+			Data.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
 
-	async getAllTracksInfo() {
-		await this.waitForUserAuthenticated();
+	/** Gets all tracks */
+	async getAllTracksInfo(): Promise<KeyArray<string, TrackInfo>> {
+		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `tracks`));
 
 		if (snapshot.exists()) {
 			return snapshot.val();
 		} else {
-			this.cloneDefaultUserTemplate((LoginManager.user as User).uid);
+			Data.cloneDefaultUserTemplate((LoginManager.user as User).uid);
 			throw new Error("No data available");
 		}
 	},
 
-	async getFullTracksInfo(userid: string) {
-		await this.waitForUserAuthenticated();
-		const trackinfo = await this.getAllTracksInfo();
-		const userdataforid = await this.getUserTrackData(userid);
+	/** Gets the full info (track data and rank data) from all tracks for a user */
+	async getFullTracksInfo(userid: string): Promise<KeyArray<IDRange, DataInfo>> {
+		await Data.waitForUserAuthenticated();
+		const trackinfo = await Data.getAllTracksInfo();
+		const userdataforid = await Data.getUserTrackData(userid);
 
 		let full: KeyArray<IDRange, DataInfo> = {} as any;
 
-		this.keyArrayForEach(trackinfo, (track, i) => {
+		Data.keyArrayForEach(trackinfo, (track, i) => {
 			full[track.id] = {
 				...track,
-				...userdataforid[String(track.id-1)],
+				...userdataforid[String(track.id)],
 			};
 		});
 
 		return full;
 	},
 
-	async getSingleFullTrackInfo(userid: string, trackid: IDRange) {
-		await this.waitForUserAuthenticated();
-		const trackinfo = await this.getTrackInfo(trackid);
-		const userdataforid = await this.getUserTrackInfo(userid, trackid);
+	/** Gets the full info (track data and rank data) from a single track */
+	async getSingleFullTrackInfo(userid: string, trackid: IDRange): Promise<DataInfo> {
+		await Data.waitForUserAuthenticated();
+		const trackinfo = await Data.getTrackInfo(trackid);
+		const userdataforid = await Data.getUserTrackInfo(userid, trackid);
 
 		return {
 			...trackinfo,
@@ -197,7 +224,8 @@ export const Data: DataTypes = {
 		};
 	},
 
-	async cloneDefaultUserTemplate(userid) {
+	/** Clones the default user template for a new user */
+	async cloneDefaultUserTemplate(userid: string): Promise<void> {
 		const userdata = await get(ref(db, `users/${userid}`));
 		if (!userdata.exists()) {
 			const defaultUserTemplate = await get(ref(db, "defaultusertemplate"));
@@ -212,35 +240,39 @@ export const Data: DataTypes = {
 	},
 };
 
-export const URLManager: URLManager = {
-	goto(url) {
+export const URLManager = {
+	/** Centralised method of redirecting */
+	goto(url: string): void {
 		location.href = url;
 	},
 
-	gethostname() {
+	/** Gets current hostname. Returns the same as `location.href` */
+	gethostname(): string {
 		return location.hostname;
 	},
 
-	getquery() {
+	/** Gets current query. Returns the same as `location.query` */
+	getquery(): string {
 		return location.search;
 	},
 
-	reload() {
+	/** Reloads the page */
+	reload(): void {
 		return location.reload();
 	},
 };
 
 /** General utilities */
-export const Utils: Utils = {
-	getEmail() {
+export const Utils = {
+	getEmail(): string | null {
 		return Utils.getLocalStorage("email");
 	},
 
-	getUid() {
+	getUid(): string | null {
 		return Utils.getLocalStorage("uid");
 	},
 
-	logout() {
+	logout(): void {
 		if (LoginManager.user !== undefined) {
 			Utils.setLocalStorage("email", "");
 			Utils.setLocalStorage("uid", "");
@@ -253,11 +285,27 @@ export const Utils: Utils = {
 		}
 	},
 
-	setLocalStorage(key: string, value: string) {
+	/** Centralised way of setting values in LocalStorage
+	 * @example
+	 * Utils.setLocalStorage("key", "value")
+	 * // is the same as
+	 * localStorage.setItem("key", "value")
+	 */
+	setLocalStorage(key: string, value: string): void {
 		return localStorage.setItem(key, value);
 	},
 
-	getLocalStorage(key: string) {
+	/** Centralised way of getting values from LocalStorage
+	 * @example
+	 * Utils.getLocalStorage("key")
+	 * // is the same as
+	 * localStorage.getItem("key")
+	 */
+	getLocalStorage(key: string): string | null {
 		return localStorage.getItem(key);
+	},
+
+	numberToString(num: number): string {
+		return String(num);
 	},
 };

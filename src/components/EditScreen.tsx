@@ -44,11 +44,7 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 
 	form(): void {
 		const edit = document.getElementById("edit") as HTMLElement;
-		// fixit - this.state.id is 1 too high but dislikes having -1 done to it.
-		// fixit - this throws an error (TypeError: cannot read property `id` of undefined)
-		// fixit - this is quite urgent
 		Data.getSingleFullTrackInfo(Utils.getUid() as string, this.state.id).then((data) => {
-			console.log(data);
 			edit.replaceChildren(
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
@@ -84,7 +80,7 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									Normal Dash Count
 								</label>
 								<select
-									defaultValue={data.normal.dash}
+									defaultValue={Data.isValidDash(data.normal.dash) ? data.normal.dash : "Error"}
 									className="form-select"
 									id="normalDash"
 									name="normalDash"
@@ -95,6 +91,7 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
+									<option value="Error" disabled>Error</option>
 								</select>
 							</div>
 							<div className="mb-3">
@@ -121,7 +118,7 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									Hardcore Dash Count
 								</label>
 								<select
-									defaultValue={data.hardcore.dash}
+									defaultValue={Data.isValidDash(data.normal.dash) ? data.normal.dash : "Error"}
 									className="form-select"
 									id="hardcoreDash"
 									name="hardcoreDash"
@@ -132,6 +129,7 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
+									<option value="Error" disabled>Error</option>
 								</select>
 							</div>
 							<div className="d-grid">
