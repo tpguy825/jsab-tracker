@@ -7,11 +7,15 @@ const JSABS = "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png";
 export default class Main extends React.Component {
 	state: AppState = { table: [], tablejsx: [] };
 	hostname: string;
+	data?: KeyArray<IDRange, DataInfo>;
 
 	constructor(props: {}) {
 		super(props);
 
-		this.hostname = URLManager.gethostname() === "localhost" ? "http://localhost:80" : URLManager.gethostname();
+		this.hostname = URLManager.gethostname();
+		if (this.hostname === "localhost") {
+			this.hostname = "http://localhost:80";
+		}
 	}
 
 	async getTable() {
@@ -19,34 +23,20 @@ export default class Main extends React.Component {
 
 		let table = tablebody as HTMLElement;
 
-		const data = await Data.getFullTracksInfo(Utils.getUid() as string);
+		if (this.data === undefined) {
+			this.data = await Data.getFullTracksInfo(Utils.getUid() as string);
+		}
 
 		let jsx = <span>Loading...</span>;
 		table.innerHTML = "";
-		Data.keyArrayForEach(data, (row) => {
+		Data.keyArrayForEach(this.data, (row) => {
 			jsx = (
 				<>
 					<th scope="row">{row.id}</th>
 					<td>{row.name}</td>
-					{row.normal.rank === "" ? (
-						<td className="unknown">Unknown</td>
-					) : row.normal.rank === "S" ? (
-						<td>
-							<img src={JSABS} alt="S" className="s-rank" />
-						</td>
-					) : (
-						<td>{row.normal.rank}</td>
-					)}
+					{this.parserank(row.normal.rank)}
 					{this.parsedash(row.normal.dash)}
-					{row.hardcore.rank === "" ? (
-						<td className="unknown">Unknown</td>
-					) : row.hardcore.rank === "S" ? (
-						<td>
-							<img src={JSABS} alt="S" className="s-rank" />
-						</td>
-					) : (
-						<td>{row.hardcore.rank}</td>
-					)}
+					{this.parserank(row.hardcore.rank)}
 					{this.parsedash(row.hardcore.dash)}
 					<td>
 						<button type="button" className="btn btn-primary" data-id={`${row.id}`}>
@@ -81,16 +71,38 @@ export default class Main extends React.Component {
 			await this.getTable();
 		} catch (e) {
 			console.log(e);
-			const timeoutfunc = async (getTable: () => Promise<void>, nextfunc: any) => {
+			type timeoutfunc = (getTable: () => Promise<void>, nextfunc: timeoutfunc, i: number) => Promise<void>;
+			const timeoutfunc: timeoutfunc = async (getTable, nextfunc, i) => {
+				if (i > 5) {
+					URLManager.goto("/login");
+					return;
+				}
+
 				try {
 					await getTable();
 				} catch (e) {
 					console.log(e);
-					const timeoutfunc = (nextfunc: any) => {};
-					setTimeout(() => nextfunc(getTable, nextfunc), 100);
+					setTimeout(() => nextfunc(getTable, nextfunc, i + 1), 300);
 				}
 			};
-			setTimeout(() => timeoutfunc(this.getTable, timeoutfunc), 100);
+			setTimeout(() => timeoutfunc(this.getTable, timeoutfunc, 1), 300);
+		}
+	}
+
+	parserank(rank: Rank) {
+		switch (rank) {
+			case "":
+				return <td className="unknown">Unknown</td>;
+
+			case "S":
+				return (
+					<td>
+						<img src={JSABS} alt="S" className="s-rank" />
+					</td>
+				);
+
+			default:
+				return <td>{rank}</td>;
 		}
 	}
 

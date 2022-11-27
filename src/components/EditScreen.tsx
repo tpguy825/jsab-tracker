@@ -2,7 +2,6 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Data, URLManager, Utils } from "@src/DataManager";
 import $ from "jquery";
-import { log } from "console";
 
 export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 	rankelement?: HTMLSelectElement;
@@ -49,7 +48,6 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 				this.jsxtohtml(
 					<div className="container px-5 my-5">
 						<form className="form" id="edit-form">
-							{/* hidden input */}
 							<input aria-hidden="true" type="hidden" name="id" value={data.id} />
 							<div className="mb-3">
 								<span>

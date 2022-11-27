@@ -12,7 +12,7 @@ tr,
 	// background-color: #222222;
 	background-color: $gray-900;
 	color: $gray-100;
-	// color: $bs-grey-200 !important;
+	// color: $bs-gray-200 !important;
 }
 
 .unknown {
@@ -79,18 +79,12 @@ tr,
 }
 
 .nodash {
-	color: rgb(235, 255, 235)
+	color: rgb(235, 255, 235);
 }
 
 .s-rank-text {
 	background: rgb(239, 64, 118);
-	background: linear-gradient(
-		0deg,
-		rgba(239, 64, 118, 1) 0%,
-		rgba(189, 96, 140, 1) 25%,
-		rgba(106, 139, 178, 1) 56%,
-		rgba(5, 206, 230, 1) 100%
-	);
+	background: linear-gradient(0deg, rgba(239, 64, 118, 1) 0%, rgba(189, 96, 140, 1) 25%, rgba(106, 139, 178, 1) 56%, rgba(5, 206, 230, 1) 100%);
 	background-size: 100%;
 
 	-webkit-background-clip: text;
@@ -101,6 +95,48 @@ tr,
 }
 
 .login-goback {
-	margin: 10px;
+	margin: 15px;
 	display: inline-block;
+}
+
+footer {
+	margin-top: 1.5rem;
+}
+
+.footer-icon {
+	animation: 0.3s;
+	animation-fill-mode: forwards;
+	color: var(--bs-gray-500);
+}
+
+.footer-icon:hover {
+	color: #084298;
+}
+
+.youtube-icon {
+	animation: 0.3s;
+	animation-fill-mode: forwards;
+	color: var(--bs-gray-500);
+}
+
+.youtube-icon:hover {
+	color: #dc3545;
+}
+
+.github-icon {
+	animation: 0.3s;
+	animation-fill-mode: forwards;
+	color: var(--bs-gray-500);
+}
+
+.github-icon:hover {
+	color: #000;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active,
+a {
+	text-decoration: none !important;
 }
