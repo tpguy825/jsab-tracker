@@ -27,7 +27,7 @@ interface MainConfig {
 	footermessage?: string | JSX.Element;
 }
 
-type AnalyticsOptions = {
+export type AnalyticsOptions = {
 			/** Whether to use Google Analytics */
 			enabled: true;
 			

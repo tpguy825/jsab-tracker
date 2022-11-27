@@ -29,6 +29,11 @@ export default class Main extends React.Component {
 
 		let jsx = <span>Loading...</span>;
 		table.innerHTML = "";
+
+		// todo: add a progress bar at the top of the screen
+		// - one for coverage
+		// - another for total progress
+		//    - this one might be difficult as some levels can't be completed with "No Dash" (e.g. Spectra, Try This, etc.)
 		Data.keyArrayForEach(this.data, (row) => {
 			jsx = (
 				<>

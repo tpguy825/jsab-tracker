@@ -1,12 +1,15 @@
 import { Partytown } from "@builder.io/partytown/react";
-import MainConfig from "@config/MainConfig";
+import MainConfig, { AnalyticsOptions } from "@config/MainConfig";
 
-const getAnalytics = (partytown: boolean, analyticsid: string) => {
+function getAnalytics(analytics: AnalyticsOptions) {
+	if (!analytics.enabled) return undefined;
+	
+	const { partytown, id } = analytics;
 	return (
 		<>
 			{partytown ? <Partytown forward={["dataLayer.push"]} /> : undefined}
 			{/* Google tag (gtag.js) */}
-			<script type={partytown ? "text/partytown" : undefined} async src={`https://www.googletagmanager.com/gtag/js?id=${analyticsid}`}></script>
+			<script type={partytown ? "text/partytown" : undefined} async src={`https://www.googletagmanager.com/gtag/js?id=${id}`}></script>
 			<script
 				type={partytown ? "text/partytown" : undefined}
 				dangerouslySetInnerHTML={{
@@ -14,7 +17,7 @@ const getAnalytics = (partytown: boolean, analyticsid: string) => {
 				function gtag(){dataLayer.push(arguments);}
 				
 				gtag('js', new Date());
-				gtag('config', '${analyticsid}');
+				gtag('config', '${id}');
 				`,
 				}}></script>
 		</>
@@ -26,5 +29,5 @@ const getAnalytics = (partytown: boolean, analyticsid: string) => {
  */
 export default function Extras() {
 	const { analytics } = MainConfig;
-	return <>{analytics.enabled ? getAnalytics(analytics.partytown, analytics.id) : undefined}</>;
+	return <>{getAnalytics(analytics)}</>;
 }

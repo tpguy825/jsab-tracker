@@ -30,8 +30,12 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 		this.form();
 	}
 
-	gotomain() {
-		URLManager.goto("/main");
+	gotomain(id?: IDRange) {
+		if (id) {
+			URLManager.goto(`/main#track-${id}`);
+		} else {
+			URLManager.goto(`/main`);
+		}
 	}
 
 	jsxtohtml(jsx: JSX.Element, type: string = "div") {
@@ -89,7 +93,9 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
-									<option value="Error" disabled>Error</option>
+									<option value="Error" disabled>
+										Error
+									</option>
 								</select>
 							</div>
 							<div className="mb-3">
@@ -127,7 +133,9 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 									<option value="1">Slow Poke (1-10 times)</option>
 									<option value="2">{">"} 10 times</option>
 									<option value="3">Unknown</option>
-									<option value="Error" disabled>Error</option>
+									<option value="Error" disabled>
+										Error
+									</option>
 								</select>
 							</div>
 							<div className="d-grid">
@@ -173,10 +181,10 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 							};
 
 							Data.setUserTrackData(Utils.getUid() as string, data, id).then(() => {
-								this.gotomain();
+								this.gotomain(id);
 							});
 						} else if (clickedElement && clickedElement.id === "cancelButton") {
-							this.gotomain();
+							this.gotomain(this.state.id);
 						}
 					});
 				});
