@@ -67,6 +67,14 @@ export default class Main extends React.Component {
 				}
 			}
 		});
+
+		const query = new URLSearchParams(location.search).get("goto");
+		if (query) {
+			const idtableelement = document.getElementById(`track-${query}`);
+			if (idtableelement) {
+				idtableelement.scrollIntoView();
+			}
+		}
 	}
 
 	gotoedit(id: IDRange) {

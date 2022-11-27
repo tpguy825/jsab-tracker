@@ -32,9 +32,9 @@ export default class EditScreen extends React.Component<{}, { id: IDRange }> {
 
 	gotomain(id?: IDRange) {
 		if (id) {
-			URLManager.goto(`/main#track-${id}`);
+			URLManager.goto(`/main?goto=${id}`);
 		} else {
-			URLManager.goto(`/main`);
+			URLManager.goto(`/main?goto=1`);
 		}
 	}
 
