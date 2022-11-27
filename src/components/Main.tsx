@@ -37,7 +37,9 @@ export default class Main extends React.Component {
 		Data.keyArrayForEach(this.data, (row) => {
 			jsx = (
 				<>
-					<th scope="row">{row.id}</th>
+					<th id={`track-${row.id}`} scope="row">
+						{row.id}
+					</th>
 					<td>{row.name}</td>
 					{this.parserank(row.normal.rank)}
 					{this.parsedash(row.normal.dash)}
