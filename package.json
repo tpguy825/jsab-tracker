@@ -22,7 +22,7 @@
 		"react-dom": "^18.2.0"
 	},
 	"devDependencies": {
-		"@builder.io/partytown": "^0.7.2",
+		"@builder.io/partytown": "^0.8.0",
 		"@types/cors": "^2.8.12",
 		"@types/jquery": "^3.5.14",
 		"@types/node": "^18.11.7",
