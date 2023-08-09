@@ -1,6 +1,6 @@
-import { FirebaseOptions } from "firebase/app";
+import { type FirebaseOptions } from "firebase/app";
 
-export const config: MainConfig = {
+const config: MainConfig = {
 	firebase: {
 		apiKey: "AIzaSyCYPrNNy-UFuNsC5VFd2pEiedJU2IOEf3c",
 		authDomain: "jsab-tracker.firebaseapp.com",
@@ -17,8 +17,8 @@ export const config: MainConfig = {
 		partytown: true,
 	},
 	footermessage: "If you encounter any issues, try refreshing the page.",
-};
-export default config;
+}
+export const { firebase, analytics, footermessage } = config;
 
 // types
 interface MainConfig {

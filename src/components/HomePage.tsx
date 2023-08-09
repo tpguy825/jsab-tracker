@@ -1,5 +1,5 @@
 const JSABLogo = "https://cdn.tpguy825.cf/jsab/assets/jsab-icon.png";
-import { ExternalLink } from "@components/footer/Icons";
+import { ExternalLink } from "../components/footer/Icons";
 
 export default function HomePage() {
 	return (
@@ -8,7 +8,13 @@ export default function HomePage() {
 			<nav className="navbar navbar-expand-lg navbar-dark sticky-top">
 				<div className="container-fluid">
 					<a rel="noopener" className="navbar-brand" href="#">
-						<img src={JSABLogo} alt="Logo" width="30" height="30" className="d-inline-block align-text-top" />
+						<img
+							src={JSABLogo}
+							alt="Logo"
+							width="30"
+							height="30"
+							className="d-inline-block align-text-top"
+						/>
 						JSAB Tracker
 					</a>
 					<div className="collapse navbar-collapse" id="navbarNav">
@@ -24,12 +30,20 @@ export default function HomePage() {
 								</a>
 							</li>
 							<li className="nav-item">
-								<a rel="noopener" target="_blank" className="nav-link" href="https://github.com/tpguy825/jsab-tracker/issues">
+								<a
+									rel="noopener"
+									target="_blank"
+									className="nav-link"
+									href="https://github.com/tpguy825/jsab-tracker/issues">
 									Problem? {ExternalLink}
 								</a>
 							</li>
 							<li className="nav-item">
-								<a rel="noopener" target="_blank" className="nav-link" href="https://www.justshapesandbeats.com/">
+								<a
+									rel="noopener"
+									target="_blank"
+									className="nav-link"
+									href="https://www.justshapesandbeats.com/">
 									Get JSAB {ExternalLink}
 								</a>
 							</li>

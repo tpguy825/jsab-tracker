@@ -44,10 +44,6 @@ interface DataInfo {
 	};
 }
 
-type KeyArray<Index, Data> = {
-	[Key in Index]: Data;
-};
-
 type IDRange = IntRange<1, 54>;
 
 interface TrackInfo {
@@ -106,18 +102,18 @@ type DashCount = IntRange<0, 4>;
 type Rank = "S" | "A" | "B" | "C" | "";
 
 interface AppState {
-	/** Array of levels and their info */
-	table: DataInfo[];
-
 	/** JSX for the main table */
-	tablejsx: JSX.Element[];
+	table?: JSX.Element[];
+
+	/** Levels info */
+	data?: Record<IDRange, DataInfo>;
 }
 
 
 type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc["length"]]>;
 
 /**
- * ```javascript
+ * ```typescript
 // Type version of
 if (x <= n < y) {}
 // where 
@@ -131,4 +127,5 @@ const num: IntRange<1, 10> = 10 // ❌ error
 ```
  */
 type IntRange<X extends number, Y extends number> = Exclude<Enumerate<Y>, Enumerate<X>>;
+
 

@@ -7,15 +7,5 @@ import * as path from "path";
 export default defineConfig({
 	// @ts-ignore
 	plugins: [react(), purgecss()],
-
-	resolve: {
-		alias: {
-			"~bootstrap": path.resolve(__dirname, "node_modules/bootstrap"),
-			"@src": path.resolve(__dirname, "src"),
-			"@assets": path.resolve(__dirname, "public/assets"),
-			"@config": path.resolve(__dirname, "config"),
-			"@components": path.resolve(__dirname, "src/components"),
-		},
-	},
 });
 

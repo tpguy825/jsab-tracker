@@ -15,15 +15,7 @@
 		"isolatedModules": true,
 		"noEmit": true,
 		"jsx": "react-jsx",
-		"baseUrl": ".",
-		"paths": {
-			"@src/*": ["src/*"],
-			"@assets/*": ["public/assets/*"],
-			"@config/*": ["config/*"],
-			"@components/*": ["src/components/*"]
-		}
 	},
-	"include": ["src", "config/MainConfig.tsx"],
-	"references": [{ "path": "./tsconfig.node.json" }]
+	"include": ["src", "vite.config.ts"]
 }
 

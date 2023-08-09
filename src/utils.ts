@@ -1,10 +1,18 @@
 import { FirebaseError, initializeApp } from "firebase/app";
 import { get, ref, getDatabase, set } from "firebase/database";
-import { getAuth, signInWithPopup, AuthProvider, User, linkWithPopup, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
-import mainConfig from "@config/MainConfig";
+import {
+	getAuth,
+	signInWithPopup,
+	type AuthProvider,
+	type User,
+	linkWithPopup,
+	GithubAuthProvider,
+	GoogleAuthProvider,
+} from "firebase/auth";
+import { firebase } from "./config";
 
 // Initialize Firebase
-const app = initializeApp(mainConfig.firebase);
+const app = initializeApp(firebase);
 export const db = getDatabase(app);
 const auth = getAuth(app);
 
@@ -15,14 +23,22 @@ export const LoginManager = {
 
 	user: undefined as User | undefined,
 
-	async sendLoginRedirect(p: "github" | "google"): Promise<void> {
-		let provider;
+	async sendLoginRedirect(p: "github" | "google"): Promise<
+		| {
+				success: true;
+		  }
+		| {
+				success: false;
+				error: string;
+		  }
+	> {
+		let provider: typeof GithubAuthProvider | typeof GoogleAuthProvider;
 		if (p === "github") {
 			provider = GithubAuthProvider;
 		} else if (p === "google") {
 			provider = GoogleAuthProvider;
 		} else {
-			throw new Error("Unknown provider. This should never happen.");
+			return { success: false, error: "Unknown provider. This should never happen." };
 		}
 
 		try {
@@ -41,38 +57,38 @@ export const LoginManager = {
 			Utils.setLocalStorage("uid", user.uid);
 			await Data.cloneDefaultUserTemplate(user.uid);
 			URLManager.goto("/main");
+			return { success: true };
 		} catch (e: any) {
 			let error = e as FirebaseError;
 
 			// Handle Errors here.
 			const errorCode = error.code;
 			const errorMessage = error.message;
-			// The email of the user's account used.
-			const email = error.customData?.email as string;
-			let errorhtml = document.getElementById("error") as HTMLSpanElement;
-			console.warn({ errorCode, errorMessage, email });
+			console.warn({ errorCode, errorMessage });
 
 			if (errorCode === "popup_closed_by_user") {
-				errorhtml.innerText = "Login cancelled by user";
-				return;
+				return { success: false, error: "Login cancelled by user" };
 			}
 
 			if (errorCode === "auth/account-exists-with-different-credential") {
 				try {
-					const result = await linkWithPopup(auth.currentUser as User, new provider());
-					console.log({ custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`, result });
+					const result = await linkWithPopup(auth.currentUser!, new provider());
+					console.log({
+						custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`,
+						result,
+					});
 					Utils.setLocalStorage("email", result.user.email as string);
 					Utils.setLocalStorage("uid", result.user.uid);
 					Utils.setLocalStorage("loggedin", "true");
 					await Data.cloneDefaultUserTemplate(result.user.uid);
 					URLManager.goto("/main");
+					return { success: true };
 				} catch (error: any) {
-					errorhtml.innerText = error.message;
+					return { success: false, error: error.message };
 				}
-				return;
 			}
 
-			errorhtml.innerText = errorMessage;
+			return { success: false, error: errorMessage };
 		}
 	},
 };
@@ -84,6 +100,7 @@ export const Data = {
 	/** @example
 	 * // Used to wait until a user has been authenticated.
 	 * // Firebase auth is async, so this is used to wait until it's done.
+	 * // This is blocking when awaited, so use wisely.
 	 * // Usage:
 	 *
 	 * const user = await Data.waitForUserAuthenticated()
@@ -91,43 +108,49 @@ export const Data = {
 	 * // User has now been authenticated
 	 * // `user` is of type `User`
 	 */
-	waitForUserAuthenticated(): Promise<User> {
-		return new Promise((resolve, reject) => {
-			auth.onAuthStateChanged(async (user) => {
-				if (user) {
-					let exists = await Data.checkIfUserExists(user.uid);
-					if (!exists) {
-						await Data.cloneDefaultUserTemplate(user.uid);
-					}
-					resolve(user);
-				} else {
-					if (user === null) {
-						Utils.setLocalStorage("email", "");
-						Utils.setLocalStorage("uid", "");
-						Utils.setLocalStorage("loggedin", "false");
-						URLManager.goto("/login");
+	waitForUserAuthenticated(): BetterPromise<User, Error> {
+		return promise(async (resolve, reject) => {
+			try {
+				auth.onAuthStateChanged(async (user) => {
+					if (user) {
+						let exists = await Data.checkIfUserExists(user.uid);
+						if (!exists) {
+							await Data.cloneDefaultUserTemplate(user.uid).catch((e) => {
+								reject(<Error>e);
+							});
+						}
+						resolve(user);
 					} else {
-						reject(user);
+						if (user === null) {
+							Utils.setLocalStorage("email", "");
+							Utils.setLocalStorage("uid", "");
+							Utils.setLocalStorage("loggedin", "false");
+							URLManager.goto("/login");
+						} else {
+							reject(user);
+						}
 					}
-				}
-			});
+				});
+			} catch (e) {
+				reject(<Error>e);
+			}
 		});
 	},
 
 	/** Checks if a track ID is valid */
-	isValidID(id: number): boolean {
+	isValidID(id: number): id is IDRange {
 		return id > 0 && id < 54;
 	},
 
-	isValidDash(id: number): boolean {
-		return id > 0 && id < 4;
+	isValidDash(id: number): id is 0 | 1 | 2 | 3 {
+		return Number.isInteger(id) && id > -1 && id < 4;
 	},
 
-	/** Loops over a `KeyArray` */
-	keyArrayForEach<I, V>(keyarray: KeyArray<I, V>, callbackfn: (value: V, index: I) => void): void {
-		for (const key in keyarray) {
-			callbackfn(keyarray[key], key);
-		}
+	/** Loops over a `Record` */
+	recordForEach<I extends string | number | symbol, V>(
+		keyarray: Record<I, V>,
+	): [I, V][] {
+		return Object.entries(keyarray) as [I, V][];
 	},
 
 	/** Check if a user's path exists */
@@ -144,7 +167,7 @@ export const Data = {
 	},
 
 	/** Gets full user tracks data. */
-	async getUserTrackData(userid: string): Promise<KeyArray<string, RankInfo>> {
+	async getUserTrackData(userid: string): Promise<Record<string, RankInfo>> {
 		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `users/${userid}/ranks`));
 
@@ -182,7 +205,7 @@ export const Data = {
 	},
 
 	/** Gets all tracks */
-	async getAllTracksInfo(): Promise<KeyArray<string, TrackInfo>> {
+	async getAllTracksInfo(): Promise<Record<string, TrackInfo>> {
 		await Data.waitForUserAuthenticated();
 		const snapshot = await get(ref(db, `tracks`));
 
@@ -195,14 +218,14 @@ export const Data = {
 	},
 
 	/** Gets the full info (track data and rank data) from all tracks for a user */
-	async getFullTracksInfo(userid: string): Promise<KeyArray<IDRange, DataInfo>> {
+	async getFullTracksInfo(userid: string): Promise<Record<IDRange, DataInfo>> {
 		await Data.waitForUserAuthenticated();
 		const trackinfo = await Data.getAllTracksInfo();
 		const userdataforid = await Data.getUserTrackData(userid);
 
-		let full: KeyArray<IDRange, DataInfo> = {} as any;
+		let full: Record<IDRange, DataInfo> = {} as any;
 
-		Data.keyArrayForEach(trackinfo, (track, i) => {
+		Data.recordForEach(trackinfo).forEach(([_, track]) => {
 			full[track.id] = {
 				...track,
 				...userdataforid[String(track.id)],
@@ -232,7 +255,9 @@ export const Data = {
 			if (defaultUserTemplate.exists()) {
 				return set(ref(db, `users/${userid}`), defaultUserTemplate.val());
 			} else {
-				throw new Error("Failed to get default user template. This should never happen. If it does, try refreshing the page.");
+				throw new Error(
+					"Failed to get default user template. This should never happen. If it does, try refreshing the page.",
+				);
 			}
 		} else {
 			console.debug("User data already exists, not cloning default user template");
@@ -273,14 +298,14 @@ export const Utils = {
 	},
 
 	logout(): void {
-		if (LoginManager.user !== undefined) {
+		if (LoginManager.user) {
 			Utils.setLocalStorage("email", "");
 			Utils.setLocalStorage("uid", "");
 			Utils.setLocalStorage("loggedin", "false");
 			auth.signOut();
 			URLManager.reload();
 		} else {
-			throw new Error("User is not logged in");
+			console.warn("User is not logged in");
 			URLManager.goto("/login");
 		}
 	},
@@ -309,3 +334,20 @@ export const Utils = {
 		return String(num);
 	},
 };
+
+function promise<Resolve, Reject>(
+	cb: (resolve: (value: Resolve) => void, reject: (reason?: Reject) => void) => void,
+): BetterPromise<Resolve, Reject> {
+	return new Promise(cb) as BetterPromise<Resolve, Reject>;
+}
+
+type BetterPromise<Resolve, Reject> = Promise<Resolve> & {
+	then<NextResolve, NextReject>(
+		onfulfilled?: ((value: Resolve) => NextResolve | BetterPromiseLike<NextResolve, NextReject>) | null,
+		onrejected?: ((reason: Reject) => NextReject | BetterPromiseLike<NextReject, unknown>) | null,
+	): BetterPromise<NextResolve, NextReject>;
+	catch<NextReject>(
+		onrejected?: (reason: Reject) => NextReject | BetterPromiseLike<Resolve, NextReject>,
+	): BetterPromise<Resolve, NextReject>;
+};
+type BetterPromiseLike<Resolve, Reject> = Pick<BetterPromise<Resolve, Reject>, "then">;

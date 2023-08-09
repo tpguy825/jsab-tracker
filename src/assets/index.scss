@@ -1,6 +1,3 @@
-// Import all of Bootstrap's CSS
-@import "~bootstrap/scss/bootstrap";
-
 .help {
 	cursor: help;
 }
@@ -8,22 +5,27 @@
 body,
 td,
 tr,
+th,
 .form-select {
 	// background-color: #222222;
-	background-color: $gray-900;
-	color: $gray-100;
+	background-color: #212529 !important;
+	color: #f8f9fa !important;
 	// color: $bs-gray-200 !important;
 }
 
 .unknown {
-	color: $gray-500 !important;
+	color: #adb5bd !important;
 }
 
 .container {
 	margin-top: 10px;
 }
 
-#refreshbutton {
+.refresh {
+	margin-left: 5px;
+}
+
+.logout {
 	margin-left: 5px;
 }
 

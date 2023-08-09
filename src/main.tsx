@@ -5,19 +5,20 @@ import "bootstrap";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Centralised way of managing project data
-import { LoginManager, Utils } from "@src/DataManager";
+import { LoginManager, Utils } from "./utils";
 
 // Components
-import Main from "@components/Main";
-import Footer from "@components/footer/Footer";
-import LoginScreen from "@components/LoginScreen";
-import EditScreen from "@components/EditScreen";
-import HomePage from "@components/HomePage";
-import Extras from "@components/Extras";
+import Main from "./components/Main";
+import Footer from "./components/footer/Footer";
+import LoginScreen from "./components/LoginScreen";
+import EditScreen from "./components/EditScreen";
+import HomePage from "./components/HomePage";
+import Extras from "./components/Extras";
 
 // Styles
-import "@assets/index.scss";
-import MainConfig from "@config/MainConfig";
+import "./assets/index.scss";
+import "bootstrap/scss/bootstrap.scss";
+import { footermessage } from "./config";
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
 	Utils.setLocalStorage("loggedin", "false");
@@ -48,6 +49,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<Extras />
 		<RouterProvider router={router} />
 		<hr />
-		<Footer>{MainConfig.footermessage}</Footer>
-	</React.StrictMode>
+		<Footer>{footermessage}</Footer>
+	</React.StrictMode>,
 );
+

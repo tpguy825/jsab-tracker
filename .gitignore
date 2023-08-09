@@ -11,10 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+*test*
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 *.code-workspace
 .idea
 .DS_Store
@@ -28,4 +27,3 @@ dist-ssr
 .dccache
 .vercel
 public/~partytown
-
