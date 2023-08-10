@@ -27,8 +27,10 @@ export default class Main extends Component<AppProps, AppState> {
 		let data = this.state.data;
 		if (!data) {
 			data = await Data.getFullTracksInfo(Utils.getUid() as string, this.go);
-			this.setState({ data });
-		}
+			this.setState({ data, table: undefined });
+		} else {
+			this.setState({ table: undefined})
+				}
 
 		const table = Data.recordForEach(data).map(([id, row]) => {
 			return <tr key={id}>
@@ -127,7 +129,7 @@ export default class Main extends Component<AppProps, AppState> {
 						<button
 							type="button"
 							className="btn btn-primary refresh"
-							onClick={URLManager.reload}>
+							onClick={this.getTable.bind(this)}>
 							Refresh
 						</button>
 					</div>

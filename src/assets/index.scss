@@ -53,12 +53,12 @@ th,
 
 .github-login {
 	color: #fff;
-	background-color: #24292e;
+	background-color: #24292e !important;
 }
 
 .google-login {
 	color: #fff;
-	background-color: #c9c9c9;
+	background-color: #c9c9c9 !important;
 }
 
 .google-icon {
@@ -85,7 +85,13 @@ th,
 
 .s-rank-text {
 	background: rgb(239, 64, 118);
-	background: linear-gradient(0deg, rgba(239, 64, 118, 1) 0%, rgba(189, 96, 140, 1) 25%, rgba(106, 139, 178, 1) 56%, rgba(5, 206, 230, 1) 100%);
+	background: linear-gradient(
+		0deg,
+		rgba(239, 64, 118, 1) 0%,
+		rgba(189, 96, 140, 1) 25%,
+		rgba(106, 139, 178, 1) 56%,
+		rgba(5, 206, 230, 1) 100%
+	);
 	background-size: 100%;
 
 	-webkit-background-clip: text;
@@ -105,8 +111,7 @@ footer {
 }
 
 .footer-icon {
-	animation: 0.3s;
-	animation-fill-mode: forwards;
+	transition: all 0.3s;
 	color: var(--bs-gray-500);
 }
 
@@ -115,8 +120,7 @@ footer {
 }
 
 .youtube-icon {
-	animation: 0.3s;
-	animation-fill-mode: forwards;
+	transition: all 0.3s;
 	color: var(--bs-gray-500);
 }
 
@@ -125,8 +129,7 @@ footer {
 }
 
 .github-icon {
-	animation: 0.3s;
-	animation-fill-mode: forwards;
+	transition: all 0.3s ease-in-out;
 	color: var(--bs-gray-500);
 }
 

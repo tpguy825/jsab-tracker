@@ -22,7 +22,7 @@ export const LoginManager = {
 		return auth.currentUser !== null && Utils.getLocalStorage("loggedin") === "true";
 	},
 
-	user: undefined as User | undefined,
+	user: null as User | null,
 
 	async sendLoginRedirect(
 		p: "github" | "google",
@@ -48,7 +48,9 @@ export const LoginManager = {
 		try {
 			let result = await signInWithPopup(auth, new provider() as AuthProvider);
 			// let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
-			await auth.updateCurrentUser(result.user);
+			await auth.updateCurrentUser(result.user).then(() => {
+				LoginManager.user = result.user;
+			});
 
 			// The signed-in user info.
 			let user = result.user;
@@ -79,6 +81,7 @@ export const LoginManager = {
 						custommessage: `Welcome, ${result.user.displayName} [${result.user.email}]`,
 						result,
 					});
+					LoginManager.user = result.user;
 					Utils.setLocalStorage("email", result.user.email as string);
 					Utils.setLocalStorage("uid", result.user.uid);
 					Utils.setLocalStorage("loggedin", "true");
@@ -269,11 +272,6 @@ export const URLManager = {
 	getquery(): string {
 		return location.search;
 	},
-
-	/** Reloads the page */
-	reload(): void {
-		return location.reload();
-	},
 };
 
 /** General utilities */
@@ -288,11 +286,12 @@ export const Utils = {
 
 	logout(go: Go): void {
 		if (LoginManager.user) {
+			LoginManager.user = null;
 			Utils.setLocalStorage("email", "");
 			Utils.setLocalStorage("uid", "");
 			Utils.setLocalStorage("loggedin", "false");
 			auth.signOut();
-			URLManager.reload();
+			go("login");
 		} else {
 			console.warn("User is not logged in");
 			go("login");
