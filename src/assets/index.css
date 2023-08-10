@@ -1,36 +1,29 @@
-.help {
-	cursor: help;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body,
 td,
 tr,
 th,
 .form-select {
-	// background-color: #222222;
-	background-color: #212529 !important;
-	color: #f8f9fa !important;
-	// color: $bs-gray-200 !important;
+	@apply bg-white border-gray-200 text-gray-300 dark:bg-zinc-800;
 }
 
 .unknown {
 	color: #adb5bd !important;
 }
 
-.container {
-	margin-top: 10px;
-}
-
-.refresh {
-	margin-left: 5px;
-}
-
-.logout {
-	margin-left: 5px;
-}
-
 .form {
 	margin: 15px;
+}
+
+tbody > tr {
+	@apply border-y border-gray-400;
+}
+
+td {
+	@apply py-3
 }
 
 .rank {
@@ -47,10 +40,6 @@ th,
 	margin: 3px;
 }
 
-.login-button {
-	margin: 5px;
-}
-
 .github-login {
 	color: #fff;
 	background-color: #24292e !important;
@@ -58,7 +47,7 @@ th,
 
 .google-login {
 	color: #fff;
-	background-color: #c9c9c9 !important;
+	background-color: #707070 !important;
 }
 
 .google-icon {
@@ -72,11 +61,6 @@ th,
 
 .signupbutton {
 	margin: 5px;
-}
-
-.s-rank {
-	width: 0.6rem;
-	height: 1rem;
 }
 
 .nodash {
@@ -108,11 +92,6 @@ th,
 
 footer {
 	margin-top: 1.5rem;
-}
-
-.footer-icon {
-	transition: all 0.3s;
-	color: var(--bs-gray-500);
 }
 
 .footer-icon:hover {

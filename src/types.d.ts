@@ -109,6 +109,8 @@ interface AppState {
 
 	/** Levels info */
 	data?: Record<IDRange, DataInfo>;
+
+	showEmail?: boolean
 }
 
 type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
@@ -147,5 +149,12 @@ interface ReadonlyArray<T> {
 	 * @param fromIndex The position in this array at which to begin searching for searchElement.
 	 */
 	includes(searchElement: unknown, fromIndex?: number): searchElement is T;
-
 }
+
+declare module "vite-plugin-purgecss" {
+	import { UserDefinedOptions } from "purgecss";
+	import { Plugin } from "vite";
+
+	export default function (options?: Partial<UserDefinedOptions>): Plugin;
+}
+

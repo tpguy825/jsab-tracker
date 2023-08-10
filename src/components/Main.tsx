@@ -1,5 +1,5 @@
 import { Data, LoginManager, URLManager, Utils } from "../utils";
-import { Component } from "preact"
+import { Component } from "preact";
 import type { Go } from "../main";
 const JSABS = "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png";
 
@@ -29,25 +29,30 @@ export default class Main extends Component<AppProps, AppState> {
 			data = await Data.getFullTracksInfo(Utils.getUid() as string, this.go);
 			this.setState({ data, table: undefined });
 		} else {
-			this.setState({ table: undefined})
-				}
+			this.setState({ table: undefined });
+		}
 
 		const table = Data.recordForEach(data).map(([id, row]) => {
-			return <tr key={id}>
-				<th id={`track-${id}`} scope="row">
-					{id}
-				</th>
-				<td>{row.name}</td>
-				{this.parserank(row.normal.rank)}
-				{this.parsedash(row.normal.dash)}
-				{this.parserank(row.hardcore.rank)}
-				{this.parsedash(row.hardcore.dash)}
-				<td>
-					<button type="button" className="btn btn-primary" onClick={() => this.gotoedit(row.id)}>
-						Edit
-					</button>
-				</td>
-			</tr>
+			return (
+				<tr key={id}>
+					<th class="w-10" id={`track-${id}`} scope="row">
+						{id}
+					</th>
+					<td>{row.name}</td>
+					{this.parserank(row.normal.rank)}
+					{this.parsedash(row.normal.dash)}
+					{this.parserank(row.hardcore.rank)}
+					{this.parsedash(row.hardcore.dash)}
+					<td>
+						<button
+							type="button"
+							className="inline-block select-none rounded-lg bg-blue-600 px-4 py-1.5 text-white hover:bg-blue-700"
+							onClick={() => this.gotoedit(row.id)}>
+							Edit
+						</button>
+					</td>
+				</tr>
+			);
 		}, this);
 
 		// todo: add a progress bar at the top of the screen
@@ -60,7 +65,7 @@ export default class Main extends Component<AppProps, AppState> {
 	}
 
 	gotoedit(id: IDRange) {
-		this.go("edit", id)
+		this.go("edit", id);
 	}
 
 	async componentDidMount() {
@@ -82,17 +87,17 @@ export default class Main extends Component<AppProps, AppState> {
 	parserank(rank: Rank) {
 		switch (rank) {
 			case "":
-				return <td className="unknown">Unknown</td>;
+				return <td className="unknown flex justify-center mt-0.5">Unknown</td>;
 
 			case "S":
 				return (
-					<td>
-						<img src={JSABS} alt="S" className="s-rank" />
+					<td class="flex justify-center mt-1.5">
+						<img src={JSABS} alt="S" className="h-5" />
 					</td>
 				);
 
 			default:
-				return <td>{rank}</td>;
+				return <td class="flex h-5 text-lg justify-center mt-1">{rank}</td>;
 		}
 	}
 
@@ -117,55 +122,58 @@ export default class Main extends Component<AppProps, AppState> {
 
 	render() {
 		if (!LoginManager.loggedin()) {
-			this.go("login")
+			this.go("login");
 			return <span>Redirecting to login page...</span>;
 		}
 		console.log(this.state);
 
 		return (
-			<div className="container">
-				<div className="row">
-					<div className="col-2">
+			<div className="m-4">
+				<div className="justify-between sm:flex">
+					<div>
 						<button
 							type="button"
-							className="btn btn-primary refresh"
+							className="inline-block select-none rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
 							onClick={this.getTable.bind(this)}>
 							Refresh
 						</button>
 					</div>
-					<div className="col text-end">
-						Logged in as {Utils.getEmail()}. Not you?{" "}
-						<button className="btn btn-primary logout" onClick={() => Utils.logout(this.go)} type="button">
+					<div>
+						Logged in as {this.state.showEmail ? <span onClick={() => this.setState({ showEmail: false })}>{Utils.getEmail() || "[loading...]"}</span> : <span onClick={() => this.setState({ showEmail: true })}>[click to reveal email]</span>}. Not you?{" "}
+						<button
+							className="ml-1 inline-block select-none rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+							onClick={() => Utils.logout(this.go)}
+							type="button">
 							Log out
 						</button>
 					</div>
 				</div>
-				<table className="table">
+				<table className="mt-8 w-full">
 					<thead>
 						<tr>
 							<th
-								className="help idcol"
+								className="w-10 cursor-help"
 								title="How far down the track is on the playlist screen"
 								scope="col">
 								#
 							</th>
-							<th className="help" title="Track Name" scope="col">
+							<th className="cursor-help" title="Track Name" scope="col">
 								Name
 							</th>
-							<th className="help" title="Normal Rank (S, A, B, C or Unknown)" scope="col">
+							<th className="cursor-help" title="Normal Rank (S, A, B, C or Unknown)" scope="col">
 								Normal Rank
 							</th>
 							<th
-								className="help"
+								className="cursor-help"
 								title="Amount of times you dashed in a level on 'Normal' mode"
 								scope="col">
 								Dash (Normal)
 							</th>
-							<th className="help" title="Hardcore Rank (S, A, B, C or Unknown)" scope="col">
+							<th className="cursor-help" title="Hardcore Rank (S, A, B, C or Unknown)" scope="col">
 								Hardcore Rank
 							</th>
 							<th
-								className="help"
+								className="cursor-help"
 								title="Amount of times you dashed in a level on 'Hardcore' mode"
 								scope="col">
 								Dash (Hardcore)
