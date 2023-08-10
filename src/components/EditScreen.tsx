@@ -1,18 +1,19 @@
-import React from "react";
+import { useEffect, useState } from "preact/hooks";
 import { Data, URLManager, Utils } from "../utils";
+import type { JSX } from "preact";
+import type { Go } from "../main";
 
-export default class EditScreen extends React.Component<{}, RankInfo & { id: IDRange; data?: DataInfo }> {
-	constructor(props: Record<string, unknown>) {
-		super(props);
-		const editid = this.getEditID();
-		if (!Data.isValidID(editid)) {
-			this.gotomain();
-		} else {
-			this.setState({ id: editid });
-		}
+export default function EditScreen({ go }: { go: Go }): JSX.Element | null {
+	const editid = getEditID();
+	if (!Data.isValidID(editid)) {
+		go("main");
+		return null
 	}
+	const[rank, setRank] = useState<RankInfo>()
+	const[id, setId] = useState(editid)
+	const[data, setData] = useState<DataInfo>()
 
-	getEditID(): -1 | IDRange {
+	function getEditID(): -1 | IDRange {
 		const params = new URLSearchParams(window.location.search).get("id");
 		if (!params || Number.isNaN(Number(params))) {
 			return -1;
@@ -22,31 +23,35 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 		}
 	}
 
-	componentDidMount(): void {
-		Data.getSingleFullTrackInfo(Utils.getUid() as string, this.state.id).then((d) =>
-			this.setState({ data: d }),
-		);
-	}
+	useEffect(() => {
+		Data.getSingleFullTrackInfo(Utils.getUid() as string, id, go).then((d) => {
+			setData(d);
+			setRank({
+				id: d.id,
+				normal: d.normal,
+				hardcore: d.hardcore,
+			})
+		});
+	}, [id]);
 
-	gotomain(id?: IDRange) {
+	function gotomain(id?: IDRange) {
 		if (id) {
-			URLManager.goto(`/main?goto=${id}`);
+			go("main", id)
 		} else {
-			URLManager.goto(`/main`);
+			go("main")
 		}
 	}
 
-	render() {
 		return (
 			<div id="edit" className="container px-5 my-5">
 				<div className="mb-3">
-					{this.state.data ? (
+					{data && rank ? (
 						<div className="container px-5 my-5">
 							<form className="form" id="edit-form">
-								<input aria-hidden="true" type="hidden" name="id" value={this.state.data.id} />
+								<input aria-hidden="true" type="hidden" name="id" value={data.id} />
 								<div className="mb-3">
 									<span>
-										{this.state.data.name} - {this.state.data.artist}
+										{data.name} - {data.artist}
 									</span>
 								</div>
 								<div className="mb-3">
@@ -54,10 +59,18 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 										Normal Rank
 									</label>
 									<select
-										defaultValue={this.state.data.normal.rank}
+										defaultValue={data.normal.rank}
 										className="form-select"
 										id="normalRank"
-										name="normalRank"
+										onChange={(e) => {
+											setRank({
+												...rank,
+												hardcore: {
+													...rank.hardcore,
+													rank: e.currentTarget.value as Rank,
+												},
+											});
+										}}
 										aria-label="Normal Rank">
 										<option value="S" className="s-rank-text">
 											S
@@ -74,13 +87,19 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 									</label>
 									<select
 										defaultValue={
-											Data.isValidDash(this.state.data.normal.dash)
-												? this.state.data.normal.dash
-												: "Error"
+											Data.isValidDash(data.normal.dash) ? String(data.normal.dash) : "Error"
 										}
 										className="form-select"
 										id="normalDash"
-										name="normalDash"
+										onChange={(e) => {
+											setRank({
+												...rank,
+												normal: {
+													...rank.hardcore,
+													dash: Number(e.currentTarget.value) as DashCount,
+												},
+											});
+										}}
 										aria-label="Normal Dash Count">
 										<option value="0" className="nodash">
 											What Dash? (No Dash)
@@ -98,10 +117,18 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 										Hardcore Rank
 									</label>
 									<select
-										defaultValue={this.state.data.hardcore.rank}
+										defaultValue={data.hardcore.rank}
 										className="form-select"
+										onChange={(e) => {
+											setRank({
+												...rank,
+												hardcore: {
+													...rank.hardcore,
+													rank: e.currentTarget.value as Rank,
+												},
+											});
+										}}
 										id="hardcoreRank"
-										name="hardcoreRank"
 										aria-label="Hardcore Rank">
 										<option value="S" className="s-rank-text">
 											S
@@ -118,13 +145,19 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 									</label>
 									<select
 										defaultValue={
-											Data.isValidDash(this.state.data.normal.dash)
-												? this.state.data.normal.dash
-												: "Error"
+											Data.isValidDash(data.normal.dash) ? String(data.normal.dash) : "Error"
 										}
 										className="form-select"
+										onChange={(e) => {
+											setRank({
+												...rank,
+												hardcore: {
+													...rank.hardcore,
+													dash: Number(e.currentTarget.value) as DashCount,
+												},
+											});
+										}}
 										id="hardcoreDash"
-										name="hardcoreDash"
 										aria-label="Hardcore Dash Count">
 										<option value="0" className="nodash">
 											What Dash? (No Dash)
@@ -141,7 +174,7 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 									<button
 										className="btn btn-primary editbutton"
 										onClick={() => {
-											const data = Object.entries(this.state)
+											const data = Object.entries(rank)
 												.filter(([key]) => ["id", "hardcore", "normal"].includes(key))
 												.reduce((obj, [key, val]) => {
 													// @ts-ignore
@@ -149,12 +182,8 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 													return obj;
 												}, {} as RankInfo);
 
-											Data.setUserTrackData(
-												Utils.getUid() as string,
-												data,
-												this.state.id,
-											).then(() => {
-												this.gotomain(this.state.id);
+											Data.setUserTrackData(Utils.getUid() as string, data, id, go).then(() => {
+												gotomain(id);
 											});
 										}}
 										type="button">
@@ -162,7 +191,7 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 									</button>
 									<button
 										className="btn btn-primary editbutton"
-										onClick={() => this.gotomain(this.state.id)}
+										onClick={() => gotomain(id)}
 										type="button">
 										Cancel
 									</button>
@@ -179,6 +208,8 @@ export default class EditScreen extends React.Component<{}, RankInfo & { id: IDR
 				</div>
 			</div>
 		);
-	}
 }
+
+
+
 

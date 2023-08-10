@@ -1,4 +1,5 @@
-import { type FirebaseOptions } from "firebase/app";
+import type { FirebaseOptions } from "firebase/app";
+import type { JSX } from "preact/jsx-runtime";
 
 const config: MainConfig = {
 	firebase: {

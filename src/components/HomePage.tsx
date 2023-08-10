@@ -1,7 +1,8 @@
 const JSABLogo = "https://cdn.tpguy825.cf/jsab/assets/jsab-icon.png";
 import { ExternalLink } from "../components/footer/Icons";
+import type { Go } from "../main";
 
-export default function HomePage() {
+export default function HomePage({ go }: { go: Go }) {
 	return (
 		<>
 			{/* Bootstrap navbar */}
@@ -20,14 +21,18 @@ export default function HomePage() {
 					<div className="collapse navbar-collapse" id="navbarNav">
 						<ul className="navbar-nav">
 							<li className="nav-item">
-								<a rel="noopener" className="nav-link active" aria-current="page" href="/">
+								<span rel="noopener" className="nav-link active" aria-current="page" role="link" onClick={() => 
+									go("home")
+								}>
 									Home
-								</a>
+								</span>
 							</li>
 							<li className="nav-item">
-								<a rel="noopener" className="nav-link" href="/login">
+								<span rel="noopener" className="nav-link" role="link" onClick={() => 
+									go("login")
+								}>
 									Login
-								</a>
+								</span>
 							</li>
 							<li className="nav-item">
 								<a
@@ -64,11 +69,9 @@ export default function HomePage() {
 			</nav>
 			<div className="container text-center">
 				<p>Welcome! This home page is still under construction, so stop by later!</p>
-				<a href="/login">
-					<button type="button" className="btn btn-primary">
+				<button type="button" className="btn btn-primary" onClick={() => go("login")}>
 						Log in
 					</button>
-				</a>
 			</div>
 		</>
 	);

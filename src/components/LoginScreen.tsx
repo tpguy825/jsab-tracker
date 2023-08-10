@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { LoginManager, URLManager } from "../utils";
-import { Github, Google } from "../components/footer/Icons";
+import { useState } from "preact/hooks";
+import { LoginManager } from "../utils";
+import { Github, Google } from "./footer/Icons";
+import type { Go } from "../main";
 
-export default function LoginScreen() {
+export default function LoginScreen({ go }: { go: Go }) {
 	if (LoginManager.loggedin()) {
-		URLManager.goto("/main");
+		go("main");
 		return <span>Redirecting to main page...</span>;
 	}
 	const [error, setError] = useState("");
 	return (
 		<>
-			<button type="button" className="btn btn-primary login-goback" onClick={() => URLManager.goto("/")}>
+			<button type="button" className="btn btn-primary login-goback" onClick={() => go("home")}>
 				Go Home
 			</button>
 			<div className="container text-center">
@@ -20,7 +21,7 @@ export default function LoginScreen() {
 						type="button"
 						className="btn btn-primary github-login login-button"
 						onClick={async () => {
-							const result = await LoginManager.sendLoginRedirect("github");
+							const result = await LoginManager.sendLoginRedirect("github", go);
 							if (!result.success) {
 								setError(result.error);
 							}
@@ -32,7 +33,7 @@ export default function LoginScreen() {
 						type="button"
 						className="btn btn-primary google-login login-button"
 						onClick={async () => {
-							const result = await LoginManager.sendLoginRedirect("google");
+							const result = await LoginManager.sendLoginRedirect("google", go);
 							if (!result.success) {
 								setError(result.error);
 							}

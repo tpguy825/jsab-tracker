@@ -1,3 +1,4 @@
+import type { JSX } from "preact/jsx-runtime";
 import { Heart, Twitter, Youtube, Github, Code, Bug } from "../footer/Icons";
 
 /**

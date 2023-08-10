@@ -1,13 +1,21 @@
-import React from "react";
 import { Data, LoginManager, URLManager, Utils } from "../utils";
+import { Component } from "preact"
+import type { Go } from "../main";
 const JSABS = "https://cdn.tpguy825.cf/jsab/assets/jsab-s.png";
 
-export default class Main extends React.Component<Record<string, unknown>, AppState> {
+interface AppProps {
+	go: Go;
+}
+
+export default class Main extends Component<AppProps, AppState> {
 	hostname: string;
 	state: Readonly<AppState> = {};
+	go: Go;
 
-	constructor(props: Record<string, unknown>) {
-		super(props);
+	constructor({ go }: AppProps) {
+		super({ go });
+
+		this.go = go;
 
 		this.hostname = URLManager.gethostname();
 		if (this.hostname === "localhost") {
@@ -18,7 +26,7 @@ export default class Main extends React.Component<Record<string, unknown>, AppSt
 	async getTable() {
 		let data = this.state.data;
 		if (!data) {
-			data = await Data.getFullTracksInfo(Utils.getUid() as string);
+			data = await Data.getFullTracksInfo(Utils.getUid() as string, this.go);
 			this.setState({ data });
 		}
 
@@ -50,12 +58,12 @@ export default class Main extends React.Component<Record<string, unknown>, AppSt
 	}
 
 	gotoedit(id: IDRange) {
-		URLManager.goto(`/edit?id=${id}`);
+		this.go("edit", id)
 	}
 
 	async componentDidMount() {
 		if (!LoginManager.loggedin()) {
-			URLManager.goto("/login");
+			this.go("login");
 			return;
 		}
 
@@ -107,7 +115,7 @@ export default class Main extends React.Component<Record<string, unknown>, AppSt
 
 	render() {
 		if (!LoginManager.loggedin()) {
-			URLManager.goto("/login");
+			this.go("login")
 			return <span>Redirecting to login page...</span>;
 		}
 		console.log(this.state);
@@ -125,7 +133,7 @@ export default class Main extends React.Component<Record<string, unknown>, AppSt
 					</div>
 					<div className="col text-end">
 						Logged in as {Utils.getEmail()}. Not you?{" "}
-						<button className="btn btn-primary logout" onClick={Utils.logout} type="button">
+						<button className="btn btn-primary logout" onClick={() => Utils.logout(this.go)} type="button">
 							Log out
 						</button>
 					</div>
@@ -176,4 +184,5 @@ export default class Main extends React.Component<Record<string, unknown>, AppSt
 		);
 	}
 }
+
 

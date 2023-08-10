@@ -1,4 +1,6 @@
 /// <reference types="vite/client" />
+/// <reference types="preact" />
+/// <reference types="preact/jsx-runtime" />
 
 interface DataInfo {
 	/** How far down the level is on the playlist screen */
@@ -109,8 +111,9 @@ interface AppState {
 	data?: Record<IDRange, DataInfo>;
 }
 
-
-type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc["length"]]>;
+type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
+	? Acc[number]
+	: Enumerate<N, [...Acc, Acc["length"]]>;
 
 /**
  * ```typescript
@@ -127,5 +130,4 @@ const num: IntRange<1, 10> = 10 // ❌ error
 ```
  */
 type IntRange<X extends number, Y extends number> = Exclude<Enumerate<Y>, Enumerate<X>>;
-
 

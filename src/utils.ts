@@ -10,6 +10,7 @@ import {
 	GoogleAuthProvider,
 } from "firebase/auth";
 import { firebase } from "./config";
+import type { Go } from "./main";
 
 // Initialize Firebase
 const app = initializeApp(firebase);
@@ -18,12 +19,15 @@ const auth = getAuth(app);
 
 export const LoginManager = {
 	loggedin(): boolean {
-		return Utils.getLocalStorage("loggedin") === "true";
+		return auth.currentUser !== null && Utils.getLocalStorage("loggedin") === "true";
 	},
 
 	user: undefined as User | undefined,
 
-	async sendLoginRedirect(p: "github" | "google"): Promise<
+	async sendLoginRedirect(
+		p: "github" | "google",
+		go: Go,
+	): Promise<
 		| {
 				success: true;
 		  }
@@ -44,9 +48,7 @@ export const LoginManager = {
 		try {
 			let result = await signInWithPopup(auth, new provider() as AuthProvider);
 			// let credential: OAuthCredential = provider.credentialFromResult(result) as OAuthCredential;
-			await auth.updateCurrentUser(result.user).then(() => {
-				LoginManager.user = result.user;
-			});
+			await auth.updateCurrentUser(result.user);
 
 			// The signed-in user info.
 			let user = result.user;
@@ -56,7 +58,7 @@ export const LoginManager = {
 			Utils.setLocalStorage("email", user.email as string);
 			Utils.setLocalStorage("uid", user.uid);
 			await Data.cloneDefaultUserTemplate(user.uid);
-			URLManager.goto("/main");
+			go("main");
 			return { success: true };
 		} catch (e: any) {
 			let error = e as FirebaseError;
@@ -81,7 +83,7 @@ export const LoginManager = {
 					Utils.setLocalStorage("uid", result.user.uid);
 					Utils.setLocalStorage("loggedin", "true");
 					await Data.cloneDefaultUserTemplate(result.user.uid);
-					URLManager.goto("/main");
+					go("main");
 					return { success: true };
 				} catch (error: any) {
 					return { success: false, error: error.message };
@@ -108,31 +110,25 @@ export const Data = {
 	 * // User has now been authenticated
 	 * // `user` is of type `User`
 	 */
-	waitForUserAuthenticated(): BetterPromise<User, Error> {
+	waitForUserAuthenticated(go: Go): BetterPromise<User, Error> {
 		return promise(async (resolve, reject) => {
 			try {
 				auth.onAuthStateChanged(async (user) => {
 					if (user) {
 						let exists = await Data.checkIfUserExists(user.uid);
 						if (!exists) {
-							await Data.cloneDefaultUserTemplate(user.uid).catch((e) => {
-								reject(<Error>e);
-							});
+							await Data.cloneDefaultUserTemplate(user.uid).catch(reject);
 						}
 						resolve(user);
 					} else {
-						if (user === null) {
-							Utils.setLocalStorage("email", "");
-							Utils.setLocalStorage("uid", "");
-							Utils.setLocalStorage("loggedin", "false");
-							URLManager.goto("/login");
-						} else {
-							reject(user);
-						}
+						Utils.setLocalStorage("email", "");
+						Utils.setLocalStorage("uid", "");
+						Utils.setLocalStorage("loggedin", "false");
+						go("login");
 					}
 				});
 			} catch (e) {
-				reject(<Error>e);
+				reject(e as Error);
 			}
 		});
 	},
@@ -147,9 +143,7 @@ export const Data = {
 	},
 
 	/** Loops over a `Record` */
-	recordForEach<I extends string | number | symbol, V>(
-		keyarray: Record<I, V>,
-	): [I, V][] {
+	recordForEach<I extends string | number | symbol, V>(keyarray: Record<I, V>): [I, V][] {
 		return Object.entries(keyarray) as [I, V][];
 	},
 
@@ -161,14 +155,14 @@ export const Data = {
 	},
 
 	/** Sets the rank data for a specific song. */
-	async setUserTrackData(userid: string, data: RankInfo, id: IDRange): Promise<void> {
-		await Data.waitForUserAuthenticated();
+	async setUserTrackData(userid: string, data: RankInfo, id: IDRange, go: Go): Promise<void> {
+		await Data.waitForUserAuthenticated(go);
 		return set(ref(db, `users/${userid}/ranks/${id}`), data);
 	},
 
 	/** Gets full user tracks data. */
-	async getUserTrackData(userid: string): Promise<Record<string, RankInfo>> {
-		await Data.waitForUserAuthenticated();
+	async getUserTrackData(userid: string, go: Go): Promise<Record<string, RankInfo>> {
+		await Data.waitForUserAuthenticated(go);
 		const snapshot = await get(ref(db, `users/${userid}/ranks`));
 
 		if (snapshot.exists()) {
@@ -180,8 +174,8 @@ export const Data = {
 	},
 
 	/** Gets the info of a track for a user */
-	async getUserTrackInfo(userid: string, trackid: number): Promise<RankInfo> {
-		await Data.waitForUserAuthenticated();
+	async getUserTrackInfo(userid: string, trackid: number, go: Go): Promise<RankInfo> {
+		await Data.waitForUserAuthenticated(go);
 		const snapshot = await get(ref(db, `users/${userid}/ranks/${trackid}`));
 		if (snapshot.exists()) {
 			return snapshot.val();
@@ -192,8 +186,8 @@ export const Data = {
 	},
 
 	/** Gets the info about a track */
-	async getTrackInfo(id: IDRange): Promise<TrackInfo> {
-		await Data.waitForUserAuthenticated();
+	async getTrackInfo(id: IDRange, go: Go): Promise<TrackInfo> {
+		await Data.waitForUserAuthenticated(go);
 		const snapshot = await get(ref(db, `tracks/${id}`));
 
 		if (snapshot.exists()) {
@@ -205,8 +199,8 @@ export const Data = {
 	},
 
 	/** Gets all tracks */
-	async getAllTracksInfo(): Promise<Record<string, TrackInfo>> {
-		await Data.waitForUserAuthenticated();
+	async getAllTracksInfo(go: Go): Promise<Record<string, TrackInfo>> {
+		await Data.waitForUserAuthenticated(go);
 		const snapshot = await get(ref(db, `tracks`));
 
 		if (snapshot.exists()) {
@@ -218,10 +212,10 @@ export const Data = {
 	},
 
 	/** Gets the full info (track data and rank data) from all tracks for a user */
-	async getFullTracksInfo(userid: string): Promise<Record<IDRange, DataInfo>> {
-		await Data.waitForUserAuthenticated();
-		const trackinfo = await Data.getAllTracksInfo();
-		const userdataforid = await Data.getUserTrackData(userid);
+	async getFullTracksInfo(userid: string, go: Go): Promise<Record<IDRange, DataInfo>> {
+		await Data.waitForUserAuthenticated(go);
+		const trackinfo = await Data.getAllTracksInfo(go);
+		const userdataforid = await Data.getUserTrackData(userid, go);
 
 		let full: Record<IDRange, DataInfo> = {} as any;
 
@@ -236,10 +230,10 @@ export const Data = {
 	},
 
 	/** Gets the full info (track data and rank data) from a single track */
-	async getSingleFullTrackInfo(userid: string, trackid: IDRange): Promise<DataInfo> {
-		await Data.waitForUserAuthenticated();
-		const trackinfo = await Data.getTrackInfo(trackid);
-		const userdataforid = await Data.getUserTrackInfo(userid, trackid);
+	async getSingleFullTrackInfo(userid: string, trackid: IDRange, go: Go): Promise<DataInfo> {
+		await Data.waitForUserAuthenticated(go);
+		const trackinfo = await Data.getTrackInfo(trackid, go);
+		const userdataforid = await Data.getUserTrackInfo(userid, trackid, go);
 
 		return {
 			...trackinfo,
@@ -266,11 +260,6 @@ export const Data = {
 };
 
 export const URLManager = {
-	/** Centralised method of redirecting */
-	goto(url: string): void {
-		location.href = url;
-	},
-
 	/** Gets current hostname. Returns the same as `location.href` */
 	gethostname(): string {
 		return location.hostname;
@@ -290,14 +279,14 @@ export const URLManager = {
 /** General utilities */
 export const Utils = {
 	getEmail(): string | null {
-		return Utils.getLocalStorage("email");
+		return LoginManager.user?.email || Utils.getLocalStorage("email");
 	},
 
 	getUid(): string | null {
-		return Utils.getLocalStorage("uid");
+		return LoginManager.user?.uid || Utils.getLocalStorage("uid");
 	},
 
-	logout(): void {
+	logout(go: Go): void {
 		if (LoginManager.user) {
 			Utils.setLocalStorage("email", "");
 			Utils.setLocalStorage("uid", "");
@@ -306,10 +295,10 @@ export const Utils = {
 			URLManager.reload();
 		} else {
 			console.warn("User is not logged in");
-			URLManager.goto("/login");
+			go("login");
 		}
 	},
-
+	
 	/** Centralised way of setting values in LocalStorage
 	 * @example
 	 * Utils.setLocalStorage("key", "value")
