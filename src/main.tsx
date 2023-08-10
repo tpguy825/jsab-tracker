@@ -1,7 +1,7 @@
 // Libraries
 import "bootstrap";
 import Router from "preact-router";
-import { type ComponentChild, render } from "preact"
+import { type ComponentChild, render } from "preact";
 
 // Components
 import MainScreen from "./components/Main";
@@ -19,7 +19,11 @@ import { useState } from "preact/hooks";
 import { LoginManager, Utils } from "./utils";
 
 function useGo() {
-	const [screen, setScreen] = useState<"home" | "main" | "login" | "edit">("home");
+	const [screen, setScreen] = useState<"home" | "main" | "login" | "edit">(
+		(["/main", "/login", "/edit"] as const).includes(location.pathname)
+			? (location.pathname.slice(1) as "main" | "login" | "edit")
+			: "home",
+	);
 	interface GoFunc {
 		(where: "home" | "login", id?: void): void;
 		(where: "edit", id: IDRange): void;
@@ -35,11 +39,11 @@ function useGo() {
 			history.pushState("jsab__push", "", togo);
 		}
 		setScreen(where);
-	}
+	};
 	return [screen, go] as const;
 }
-export type Go = ReturnType<typeof useGo>[1]
-export type Screens = ReturnType<typeof useGo>[0]
+export type Go = ReturnType<typeof useGo>[1];
+export type Screens = ReturnType<typeof useGo>[0];
 
 if (!LoginManager.loggedin() && window.location.pathname !== "/login") {
 	Utils.setLocalStorage("loggedin", "false");
@@ -72,9 +76,5 @@ function Main() {
 	);
 }
 
-render(
-	<Main />,
-	document.getElementById("root") as HTMLElement,
-);
-
+render(<Main />, document.getElementById("root") as HTMLElement);
 
