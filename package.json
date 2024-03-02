@@ -16,7 +16,7 @@
 		"preact": "^10.16.0"
 	},
 	"devDependencies": {
-		"@builder.io/partytown": "^0.8.0",
+		"@builder.io/partytown": "^0.10.0",
 		"@prefresh/vite": "^2.4.1",
 		"autoprefixer": "^10.4.14",
 		"postcss": "^8.4.27",
