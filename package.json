@@ -11,7 +11,7 @@
 		"postbuild": "purgecss --css dist/assets/*.css --content dist/index.html dist/assets/*.js --output dist/assets"
 	},
 	"dependencies": {
-		"@firebase/app": "^0.9.15",
+		"@firebase/app": "^0.10.0",
 		"firebase": "^10.1.0",
 		"preact": "^10.16.0"
 	},
