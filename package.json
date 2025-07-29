@@ -16,7 +16,7 @@
 		"preact": "^10.27.0"
 	},
 	"devDependencies": {
-		"@qwik.dev/partytown": "^0.10.3",
+		"@qwik.dev/partytown": "^0.11.2",
 		"@prefresh/vite": "^2.4.8",
 		"autoprefixer": "^10.4.21",
 		"postcss": "^8.5.6",
