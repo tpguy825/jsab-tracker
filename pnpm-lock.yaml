@@ -16,11 +16,11 @@ importers:
         version: 12.0.0
       preact:
         specifier: ^10.27.0
-        version: 10.27.0
+        version: 10.27.1
     devDependencies:
       '@prefresh/vite':
         specifier: ^2.4.8
-        version: 2.4.8(preact@10.27.0)(vite@7.0.6(@types/node@24.1.0))
+        version: 2.4.8(preact@10.27.1)(vite@7.0.6(@types/node@24.1.0))
       '@qwik.dev/partytown':
         specifier: ^0.11.2
         version: 0.11.2
@@ -1078,8 +1078,8 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  preact@10.27.0:
-    resolution: {integrity: sha512-/DTYoB6mwwgPytiqQTh/7SFRL98ZdiD8Sk8zIUVOxtwq4oWcwrcd1uno9fE/zZmUaUrFNYzbH14CPebOz9tZQw==}
+  preact@10.27.1:
+    resolution: {integrity: sha512-V79raXEWch/rbqoNc7nT9E4ep7lu+mI3+sBmfRD4i1M73R3WLYcCtdI0ibxGVf4eQL8ZIz2nFacqEC+rmnOORQ==}
 
   prettier-plugin-tailwindcss@0.6.14:
     resolution: {integrity: sha512-pi2e/+ZygeIqntN+vC573BcW5Cve8zUB0SSAGxqpB4f96boZF4M3phPVoOFCeypwkpRYdi7+jQ5YJJUwrkGUAg==}
@@ -1206,6 +1206,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -1977,20 +1978,20 @@ snapshots:
 
   '@prefresh/babel-plugin@0.5.2': {}
 
-  '@prefresh/core@1.5.5(preact@10.27.0)':
+  '@prefresh/core@1.5.5(preact@10.27.1)':
     dependencies:
-      preact: 10.27.0
+      preact: 10.27.1
 
   '@prefresh/utils@1.2.1': {}
 
-  '@prefresh/vite@2.4.8(preact@10.27.0)(vite@7.0.6(@types/node@24.1.0))':
+  '@prefresh/vite@2.4.8(preact@10.27.1)(vite@7.0.6(@types/node@24.1.0))':
     dependencies:
       '@babel/core': 7.28.0
       '@prefresh/babel-plugin': 0.5.2
-      '@prefresh/core': 1.5.5(preact@10.27.0)
+      '@prefresh/core': 1.5.5(preact@10.27.1)
       '@prefresh/utils': 1.2.1
       '@rollup/pluginutils': 4.2.1
-      preact: 10.27.0
+      preact: 10.27.1
       vite: 7.0.6(@types/node@24.1.0)
     transitivePeerDependencies:
       - supports-color
@@ -2468,7 +2469,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  preact@10.27.0: {}
+  preact@10.27.1: {}
 
   prettier-plugin-tailwindcss@0.6.14(prettier@3.6.2):
     dependencies:
